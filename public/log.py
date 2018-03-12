@@ -35,7 +35,7 @@ class Logger():
         # 设置后缀名称，跟strftime的格式一样
         fh.suffix = "%Y-%m-%d.log"
 
-        log_format = logging.Formatter('%(asctime)s-%(name)s-%(levelname)s-%(message)s-[%(filename)s:%(lineno)d]')
+        log_format = logging.Formatter('%(asctime)s %(levelname)s %(message)s [%(filename)s:%(lineno)d]')
 
         ch.setFormatter(log_format)
         fh.setFormatter(log_format)
@@ -65,10 +65,11 @@ class Logger():
 
     def error(self, message):
         self.print_log('error', message)
-
+'''
 if __name__ == '__main__':
     log = Logger('INFO')
     log.info('info msg1000')
     log.debug('debug msg')
     log.warning('warning msg')
     log.error('error msg')
+'''

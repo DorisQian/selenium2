@@ -3,15 +3,16 @@
 
 import unittest
 import time
-import HTMLTestRunner
+# import HTMLTestRunner
 import logging
 import os
 from public.log import Logger
+import HTMLTestReportCN
 
 __author__ = "Doris Qian"
 
 
-logger = Logger(logname='log.txt', loglevel="INFO", logger="run.py")
+logger = Logger('INFO')
 
 
 def createsuit():
@@ -27,12 +28,15 @@ now = time.strftime("%Y-%m-%d_%H-%M-%S")
 path = os.path.abspath('..') + os.sep + 'reports' + os.sep
 filename = path + now + '_result.html'
 fp = open(filename, 'wb')
-runner = HTMLTestRunner.HTMLTestRunner(
+
+logger.info('generated testing report: %s' % filename)
+
+runner = HTMLTestReportCN.HTMLTestRunner(
     stream=fp,
     title=u'新浪邮箱测试报告',
-    description=u'用例执行情况：')
+    tester=u'Doris')
 
 if __name__ == '__main__':
-    alltestnames = createsuit()
-    runner.run(alltestnames)
+    alltests = createsuit()
+    runner.run(alltests)
     fp.close()

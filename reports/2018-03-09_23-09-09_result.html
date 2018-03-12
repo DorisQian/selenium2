@@ -189,11 +189,11 @@ function showOutput(id, name) {
 
 <div class='heading'>
 <h1>新浪邮箱测试报告</h1>
-<p class='attribute'><strong>Start Time:</strong> 2018-03-09 17:36:59</p>
-<p class='attribute'><strong>Duration:</strong> 0:00:00.085952</p>
-<p class='attribute'><strong>Status:</strong> Error 1</p>
+<p class='attribute'><strong>Start Time:</strong> 2018-03-09 23:09:09</p>
+<p class='attribute'><strong>Duration:</strong> 0:01:29.718272</p>
+<p class='attribute'><strong>Status:</strong> Pass 1</p>
 
-<p class='description'>用例执行情况：</p>
+<p class='description'>Doris</p>
 </div>
 
 
@@ -221,55 +221,31 @@ function showOutput(id, name) {
     <td>View</td>
 </tr>
 
-<tr class='errorClass'>
-    <td>unittest.loader._FailedTest</td>
+<tr class='passClass'>
+    <td>test_login.TestLogin</td>
+    <td>1</td>
     <td>1</td>
     <td>0</td>
     <td>0</td>
-    <td>1</td>
     <td><a href="javascript:showClassDetail('c1',1)">Detail</a></td>
 </tr>
 
-<tr id='ft1.1' class='none'>
-    <td class='errorCase'><div class='testcase'>test_login</div></td>
+<tr id='pt1.1' class='hiddenRow'>
+    <td class='none'><div class='testcase'>test_right</div></td>
     <td colspan='5' align='center'>
 
     <!--css div popup start-->
-    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_ft1.1')" >
-        error</a>
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_pt1.1')" >
+        pass</a>
 
-    <div id='div_ft1.1' class="popup_window">
+    <div id='div_pt1.1' class="popup_window">
         <div style='text-align: right; color:red;cursor:pointer'>
-        <a onfocus='this.blur();' onclick="document.getElementById('div_ft1.1').style.display = 'none' " >
+        <a onfocus='this.blur();' onclick="document.getElementById('div_pt1.1').style.display = 'none' " >
            [x]</a>
         </div>
         <pre>
         
-ft1.1: ImportError: Failed to import test module: test_login
-Traceback (most recent call last):
-  File "C:\Python35\lib\unittest\loader.py", line 428, in _find_test_path
-    module = self._get_module_from_name(name)
-  File "C:\Python35\lib\unittest\loader.py", line 369, in _get_module_from_name
-    __import__(name)
-  File "F:\study\sele\test_case\test_login.py", line 14, in &lt;module&gt;
-    class TestLogin(unittest):
-  File "F:\study\sele\test_case\test_login.py", line 19, in TestLogin
-    data = csv.reader(data_file, 'rb')
-_csv.Error: unknown dialect
-
-ImportError: Failed to import test module: test_login
-Traceback (most recent call last):
-  File "C:\Python35\lib\unittest\loader.py", line 428, in _find_test_path
-    module = self._get_module_from_name(name)
-  File "C:\Python35\lib\unittest\loader.py", line 369, in _get_module_from_name
-    __import__(name)
-  File "F:\study\sele\test_case\test_login.py", line 14, in &lt;module&gt;
-    class TestLogin(unittest):
-  File "F:\study\sele\test_case\test_login.py", line 19, in TestLogin
-    data = csv.reader(data_file, 'rb')
-_csv.Error: unknown dialect
-
-
+pt1.1: 
 
         </pre>
     </div>
@@ -281,9 +257,9 @@ _csv.Error: unknown dialect
 <tr id='total_row'>
     <td>Total</td>
     <td>1</td>
-    <td>0</td>
-    <td>0</td>
     <td>1</td>
+    <td>0</td>
+    <td>0</td>
     <td>&nbsp;</td>
 </tr>
 </table>
