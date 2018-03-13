@@ -86,6 +86,7 @@ class TestLogin(unittest.TestCase):
             self.login.type_password(self.password[3])
             self.login.login()
             self.driver.implicitly_wait(10)
+            time.sleep(2)
             text = self.login.find_element(By.XPATH,
                                            "/html/body/div[1]/div/div[2]/div/div/div[4]/div[1]/div[1]/div[1]/span[1]").text
             self.assertEqual(text, u"登录名或密码错误")

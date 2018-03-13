@@ -3,11 +3,11 @@
 
 import unittest
 import time
-# import HTMLTestRunner
 import logging
 import os
 from public.log import Logger
 import HTMLTestReportCN
+from public.send_mail import SendMail
 
 __author__ = "Doris Qian"
 
@@ -24,7 +24,7 @@ def createsuit():
         testunit.addTest(case)
     return testunit
 
-now = time.strftime("%Y-%m-%d_%H-%M-%S")
+now = time.strftime("%Y-%m-%d_%H_%M_%S")
 path = os.path.abspath('..') + os.sep + 'reports' + os.sep
 filename = path + now + '_result.html'
 fp = open(filename, 'wb')
@@ -37,6 +37,7 @@ runner = HTMLTestReportCN.HTMLTestRunner(
     tester=u'Doris')
 
 if __name__ == '__main__':
-    alltests = createsuit()
-    runner.run(alltests)
+    all_tests = createsuit()
+    runner.run(all_tests)
     fp.close()
+    SendMail().send_report(path)
