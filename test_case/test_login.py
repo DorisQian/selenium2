@@ -29,7 +29,7 @@ class TestLogin(unittest.TestCase):
     logger.info('username list: %s' % username)
     logger.info('password list: %s' % password)
 
-    # data = csv.reader(open(data_file, 'r'))
+    now = time.strftime('%Y-%m-%d')
 
     def setUp(self):
         self.driver = webdriver.Chrome()
@@ -53,8 +53,7 @@ class TestLogin(unittest.TestCase):
             self.assertEquals(text, u"请输入密码")
         except Exception as msg:
             self.logger.warning("reasons of exception %s" % msg)
-            now = time.strftime('%Y-%m-%d_%H-%M-%S')
-            self.driver.get_screenshot_as_file('../images/test_pwd_null_%s.png' % now)
+            self.driver.get_screenshot_as_file('../images/test_pwd_null_%s.png' % self.now)
             raise
 
     def test_null_username(self):
@@ -72,8 +71,7 @@ class TestLogin(unittest.TestCase):
             self.assertEqual(text, u"请输入邮箱名")
         except Exception as msg:
             self.logger.warning("reasons of exception %s" % msg)
-            now = time.strftime('%Y-%m-%d_%H-%M-%S')
-            self.driver.get_screenshot_as_file('../images/test_null_username_%s.png' % now)
+            self.driver.get_screenshot_as_file('../images/test_null_username_%s.png' % self.now)
             raise
 
     def test_wrong_pwd(self):
@@ -92,8 +90,7 @@ class TestLogin(unittest.TestCase):
             self.assertEqual(text, u"登录名或密码错误")
         except Exception as msg:
             self.logger.warning("reasons of exception %s" % msg)
-            now = time.strftime('%Y-%m-%d_%H-%M-%S')
-            self.driver.get_screenshot_as_file('../images/test_wrong_pwd_%s.png' % now)
+            self.driver.get_screenshot_as_file('../images/test_wrong_pwd_%s.png' % self.now)
             raise
 
     def test_right(self):
@@ -112,9 +109,8 @@ class TestLogin(unittest.TestCase):
             self.assertEqual(text, self.username[0])
         except Exception as msg:
             self.logger.warning("reasons of exception %s" % msg)
-            now = time.strftime("%Y-%m-%d_%H-%M-%S")
-            self.driver.get_screenshot_as_file('../images/test_right_%s.png' % now)
-            self.logger.info('generation scree shot-test_right_%s.png' % now)
+            self.driver.get_screenshot_as_file('../images/test_right_%s.png' % self.now)
+            self.logger.info('generation scree shot-test_right_%s.png' % self.now)
             raise
 
     def tearDown(self):

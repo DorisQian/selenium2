@@ -6,13 +6,13 @@ import time
 import logging
 import os
 from public.log import Logger
-import HTMLTestReportCN
+import HTMLTestRunnerCN
 from public.send_mail import SendMail
 
 __author__ = "Doris Qian"
 
 
-logger = Logger('INFO')
+logger = Logger('DEBUG')
 
 
 def createsuit():
@@ -31,7 +31,7 @@ fp = open(filename, 'wb')
 
 logger.info('generated testing report: %s' % filename)
 
-runner = HTMLTestReportCN.HTMLTestRunner(
+runner = HTMLTestRunnerCN.HTMLTestRunner(
     stream=fp,
     title=u'新浪邮箱测试报告',
     tester=u'Doris')
@@ -40,4 +40,6 @@ if __name__ == '__main__':
     all_tests = createsuit()
     runner.run(all_tests)
     fp.close()
-    SendMail().send_report(path)
+    flag = SendMail().pack_images()
+    logger.debug('flag is %s' % flag)
+    SendMail().send_report(path, flag)

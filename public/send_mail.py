@@ -3,6 +3,8 @@
 
 import smtplib
 import os
+import time
+import shutil
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
@@ -12,11 +14,12 @@ from .log import Logger
 __author__ = 'Doris'
 
 
-class SendMail():
+class SendMail:
 
     logger = Logger('INFO')
+    now = time.strftime('%Y-%m-%d')
 
-    def send_mail(self, msg):
+    def send_mail(self, msg, flag):
         host = 'smtp.sina.com'
         mail_user = 'doris_test'
         mail_pwd = 'admin@123'
@@ -36,6 +39,16 @@ class SendMail():
         name = msg.split(os.sep)[-1]
         attach.add_header('Content-Disposition', 'attachment', filename=name)
         message.attach(attach)
+        self.logger.info('attach reports')
+
+        # 判断是否有图片打包，发送附件
+        if flag == 'over':
+            package = os.path.abspath('..') + os.sep + 'images' + os.sep + self.now + '.zip'
+            name = self.now + '_image.zip'
+            attach = MIMEApplication(open(package, 'rb').read())
+            attach.add_header('Content-Disposition', 'attachment', filename=name)
+            message.attach(attach)
+            self.logger.info('attach images package')
 
         try:
             server = smtplib.SMTP(host, 25)
@@ -44,13 +57,38 @@ class SendMail():
             self.logger.info('send email to %s successful' % receiver)
             server.quit()
         except smtplib.SMTPException:
-            self.logger.warning('send email failed')
+            self.logger.error('send email failed')
             server.quit()
 
-    def send_report(self, path):
+    def send_report(self, path, flag):
         reports = os.listdir(path)
         reports.sort(key=lambda fn: os.path.getmtime(path+fn))
         self.logger.info('the newest report is %s' % reports[-1])
         file = os.path.join(path, reports[-1])
         self.logger.info('preparing send report %s' % file)
-        self.send_mail(file)
+        self.send_mail(file, flag)
+
+    def pack_images(self):
+        img_path = os.path.abspath('..') + os.sep + 'images' + os.sep
+        images = os.listdir(img_path)
+        images_list = list(images)
+        for img in images:
+            if not img.endswith('%s.png' % self.now):
+                images_list.remove(img)
+        if len(images_list) == 0:
+            self.logger.info('none of wrong images')
+            return 'none'
+
+        else:
+            folder = img_path + self.now
+            if os.path.exists(folder):
+                shutil.rmtree(folder)
+            os.mkdir(folder)
+            for i in images_list:
+                src = img_path + i
+                print(folder + os.sep)
+                shutil.move(src, folder)
+            shutil.make_archive(folder, 'zip', root_dir=folder)
+            self.logger.info('successful zip to %s.zip' % folder)
+            shutil.rmtree(folder)
+            return 'over'
