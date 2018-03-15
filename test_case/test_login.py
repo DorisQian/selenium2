@@ -3,7 +3,7 @@
 
 from public.PageObject.loginPage import LoginPage
 from selenium.webdriver.common.by import By
-from selenium import webdriver
+from conf.remote import RemoteDriver
 from public.log import Logger
 import time
 import unittest
@@ -32,7 +32,7 @@ class TestLogin(unittest.TestCase):
     now = time.strftime('%Y-%m-%d')
 
     def setUp(self):
-        self.driver = webdriver.Chrome()
+        self.driver = RemoteDriver().driver
         self.driver.implicitly_wait(30)
         self.login = LoginPage(self.driver)
         self.login.open()

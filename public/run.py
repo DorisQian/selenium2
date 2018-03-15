@@ -8,6 +8,7 @@ import os
 from public.log import Logger
 import HTMLTestRunnerCN
 from public.send_mail import SendMail
+from conf.remote import RemoteDriver
 
 __author__ = "Doris Qian"
 
@@ -24,7 +25,7 @@ def createsuit():
         testunit.addTest(case)
     return testunit
 
-now = time.strftime("%Y-%m-%d_%H_%M_%S")
+now = time.strftime("%Y-%m-%d_%H-%M-%S")
 path = os.path.abspath('..') + os.sep + 'reports' + os.sep
 filename = path + now + '_result.html'
 fp = open(filename, 'wb')
@@ -42,4 +43,8 @@ if __name__ == '__main__':
     fp.close()
     flag = SendMail().pack_images()
     logger.debug('flag is %s' % flag)
-    SendMail().send_report(path, flag)
+    remote = RemoteDriver()
+    host = (remote.host, remote.browser)
+    SendMail().send_report(path, flag, host)
+
+

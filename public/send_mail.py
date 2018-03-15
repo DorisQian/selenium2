@@ -19,7 +19,7 @@ class SendMail:
     logger = Logger('INFO')
     now = time.strftime('%Y-%m-%d')
 
-    def send_mail(self, msg, flag):
+    def send_mail(self, msg, flag, remote_host):
         host = 'smtp.sina.com'
         mail_user = 'doris_test'
         mail_pwd = 'admin@123'
@@ -27,13 +27,16 @@ class SendMail:
         sender = 'doris_test@sina.com'
         receiver = '1609047552@qq.com'
 
+        remote = remote_host[0]
+        browser = remote_host[1]
+
         with open(msg, 'rb') as f:
             report = f.read()
         message = MIMEMultipart()
         message.attach(MIMEText(report, 'html', 'utf-8'))
         message['From'] = Header('doris_test@sina.com')
         message['To'] = Header('1609047552@qq.com', 'utf-8')
-        message['Subject'] = Header(u'测试报告', 'utf-8')
+        message['Subject'] = Header(u'测试报告-%s:%s' % (remote, browser), 'utf-8')
 
         attach = MIMEApplication(open(msg, 'rb').read())
         name = msg.split(os.sep)[-1]
@@ -55,18 +58,19 @@ class SendMail:
             server.login(mail_user, mail_pwd)
             server.sendmail(sender, receiver, message.as_string())
             self.logger.info('send email to %s successful' % receiver)
-            server.quit()
+            server.close()
         except smtplib.SMTPException:
             self.logger.error('send email failed')
-            server.quit()
+            server.close()
 
-    def send_report(self, path, flag):
+    def send_report(self, path, flag, host):
         reports = os.listdir(path)
         reports.sort(key=lambda fn: os.path.getmtime(path+fn))
         self.logger.info('the newest report is %s' % reports[-1])
         file = os.path.join(path, reports[-1])
         self.logger.info('preparing send report %s' % file)
-        self.send_mail(file, flag)
+        host = host
+        self.send_mail(file, flag, host)
 
     def pack_images(self):
         img_path = os.path.abspath('..') + os.sep + 'images' + os.sep
@@ -86,7 +90,6 @@ class SendMail:
             os.mkdir(folder)
             for i in images_list:
                 src = img_path + i
-                print(folder + os.sep)
                 shutil.move(src, folder)
             shutil.make_archive(folder, 'zip', root_dir=folder)
             self.logger.info('successful zip to %s.zip' % folder)
