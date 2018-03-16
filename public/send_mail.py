@@ -47,7 +47,7 @@ class SendMail:
         # 判断是否有图片打包，发送附件
         if flag == 'over':
             package = os.path.abspath('..') + os.sep + 'images' + os.sep + self.now + '.zip'
-            name = self.now + '_image.zip'
+            name = remote.split(':')[0] + '-' + browser + self.now + '_image.zip'
             attach = MIMEApplication(open(package, 'rb').read())
             attach.add_header('Content-Disposition', 'attachment', filename=name)
             message.attach(attach)

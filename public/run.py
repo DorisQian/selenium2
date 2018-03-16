@@ -25,9 +25,13 @@ def createsuit():
         testunit.addTest(case)
     return testunit
 
+# 获取remote主机和浏览器
+remote = RemoteDriver()
+host = (remote.host, remote.browser)
+
 now = time.strftime("%Y-%m-%d_%H-%M-%S")
 path = os.path.abspath('..') + os.sep + 'reports' + os.sep
-filename = path + now + '_result.html'
+filename = path + remote.host.split(':')[0] + '-' + remote.browser + now + '_result.html'
 fp = open(filename, 'wb')
 
 logger.info('generated testing report: %s' % filename)
@@ -43,8 +47,6 @@ if __name__ == '__main__':
     fp.close()
     flag = SendMail().pack_images()
     logger.debug('flag is %s' % flag)
-    remote = RemoteDriver()
-    host = (remote.host, remote.browser)
     SendMail().send_report(path, flag, host)
 
 
