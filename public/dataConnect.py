@@ -155,8 +155,7 @@ class Database:
 		new_sql = ','.join(new_param)
 
 		for key, value in where_dict.items():
-			if not isinstance(value, str):
-				value = '\'' + str(value) + '\''
+			value = '\'' + value + '\''
 			where = key + '=' + value + ' and '
 			where += '1=1'
 		sql = 'update %s set %s where %s' % (tablename, new_sql, where)
