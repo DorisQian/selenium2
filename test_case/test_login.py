@@ -40,7 +40,8 @@ class TestLogin(unittest.TestCase):
 			self.browser.type_username(self.username[1])
 			self.browser.type_password(self.password[1])
 			self.browser.type_security(self.security[1])
-			self.logger.info('username, password, security: %s, %s, %s' % (self.username[1], self.password[1], self.security[1]))
+			self.logger.info('test_null_all')
+			self.logger.info('username: %s, password: %s, security: %s' % (self.username[1], self.password[1], self.security[1]))
 			self.browser.login()
 			text = self.driver.find_element(By.CLASS_NAME, 'warn').text
 			self.assertEqual(text, u'用户名、密码、验证码不可空')
@@ -55,8 +56,9 @@ class TestLogin(unittest.TestCase):
 			self.browser.type_username(self.username[2])
 			self.browser.type_password(self.password[2])
 			self.browser.type_security(self.security[2])
+			self.logger.info('test_null_username')
 			self.logger.info(
-				'username, password, security: %s, %s, %s' % (self.username[2], self.password[2], self.security[2]))
+				'username: %s, password: %s, security: %s' % (self.username[2], self.password[2], self.security[2]))
 			self.browser.login()
 			time.sleep(2)
 			text = self.driver.find_element(By.CLASS_NAME, 'warn').text
@@ -72,8 +74,9 @@ class TestLogin(unittest.TestCase):
 			self.browser.type_username(self.username[3])
 			self.browser.type_password(self.password[3])
 			self.browser.type_security(self.security[3])
+			self.logger.info('test_null_password')
 			self.logger.info(
-				'username, password, security: %s, %s, %s' % (self.username[3], self.password[3], self.security[3]))
+				'username: %s, password: %s, security: %s' % (self.username[3], self.password[3], self.security[3]))
 			self.browser.login()
 			time.sleep(2)
 			text = self.driver.find_element(By.CLASS_NAME, 'warn').text
@@ -89,8 +92,9 @@ class TestLogin(unittest.TestCase):
 			self.browser.type_username(self.username[4])
 			self.browser.type_password(self.password[4])
 			self.browser.type_security(self.security[4])
+			self.logger.info('test_null_security')
 			self.logger.info(
-				'username, password, security: %s, %s, %s' % (self.username[4], self.password[4], self.security[4]))
+				'username: %s, password: %s, security: %s' % (self.username[4], self.password[4], self.security[4]))
 			self.browser.login()
 			time.sleep(2)
 			text = self.driver.find_element(By.CLASS_NAME, 'warn').text
@@ -106,8 +110,9 @@ class TestLogin(unittest.TestCase):
 			self.browser.type_username(self.username[5])
 			self.browser.type_password(self.password[5])
 			self.browser.type_security(self.security[5])
+			self.logger.info('test_username_wrong')
 			self.logger.info(
-				'username, password, security: %s, %s, %s' % (self.username[5], self.password[5], self.security[5]))
+				'username: %s, password: %s, security: %s' % (self.username[5], self.password[5], self.security[5]))
 			self.browser.login()
 			time.sleep(2)
 			text = self.driver.find_element(By.CLASS_NAME, 'warn').text
@@ -123,8 +128,9 @@ class TestLogin(unittest.TestCase):
 		minute = self.data.select('net_sysconfig', ['DATA'], {'NAME': 'manag_safty_UserLockedTimes'})
 		self.browser.type_username(self.username[7])
 		self.browser.type_password(self.password[7])
+		self.logger.info('test_user_lock')
 		self.logger.info(
-			'username, password, security: %s, %s, %s' % (self.username[7], self.password[7], self.security[7]))
+			'username: %s, password: %s, security: %s' % (self.username[7], self.password[7], self.security[7]))
 		for t in range(int(lock_time), 0, -1):
 			try:
 				self.browser.type_security(self.security[7])
@@ -150,9 +156,11 @@ class TestLogin(unittest.TestCase):
 			self.browser.type_username(self.username[8])
 			self.browser.type_password(self.password[8])
 			self.browser.type_security(self.security[8])
+			self.logger.info('test_success_login')
 			self.logger.info(
-				'username, password, security: %s, %s, %s' % (self.username[8], self.password[8], self.security[8]))
+				'username: %s, password: %s, security: %s' % (self.username[8], self.password[8], self.security[8]))
 			self.browser.login()
+			self.browser.kick_user()
 			time.sleep(2)
 			text = self.driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/ul[1]/li[1]/a/span").text
 			self.assertEqual(text, u'安全监控')
@@ -164,6 +172,7 @@ class TestLogin(unittest.TestCase):
 	def test_z_success_logout(self):
 		u"""成功登出"""
 		try:
+			self.logger.info('test_success_log')
 			self.browser.find_element(By.XPATH, '//*[@id="navbar"]/ul[2]/li[5]/img').click()
 			text = self.driver.find_element(By.CLASS_NAME, "login-tooltip").text
 			self.assertEqual(text, u'欢迎登录')
