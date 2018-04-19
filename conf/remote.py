@@ -2,22 +2,24 @@
 # -*- coding = utf-8 -*-
 
 from selenium.webdriver import Remote
-from public.log import Logger
-
-lists = {'http://172.17.1.207:5555/wd/hub': 'chrome'}
-logger = Logger('INFO')
+from public.log import log
+import os
 
 
-class RemoteDriver():
-    def __init__(self):
-        for host, browser in lists.items():
-            self.host = host.rstrip('/wd/hub')
-            self.browser = browser
-            logger.info('host:%s,browser:%s' % (host, browser))
-            self.driver = Remote(command_executor=host,
-                                 desired_capabilities={'platform': 'ANY',
-                                                       'browserName': browser,
-                                                       'version': '',
-                                                       'javascriptEnable': True
-                                                       })
+class RemoteDriver:
+
+    _lists = {'http://172.17.1.205:5556/wd/hub': 'chrome'}
+    logger = log(os.path.basename(__file__))
+
+    for host, browser in _lists.items():
+        host = host.rstrip('/wd/hub')
+        browser = browser
+        logger.info('host:%s,browser:%s' % (host, browser))
+        driver = Remote(command_executor=host,
+                        desired_capabilities={'platform': 'ANY',
+                                              'browserName': browser,
+                                              'version': '',
+                                              'javascriptEnable': True
+                                              }
+                        )
 

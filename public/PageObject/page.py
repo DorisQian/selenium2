@@ -4,6 +4,8 @@
 from public.log import log
 from conf.configure import conf
 from selenium import webdriver
+#from public.se_rc import driver
+from conf.remote import RemoteDriver
 import time
 import os
 
@@ -17,7 +19,9 @@ class Page(object):
 
     def __init__(self):
         self._logger = log(os.path.basename(__file__))
-        self.driver = webdriver.Chrome()
+        self.remote = RemoteDriver()
+        self.driver = self.remote.driver
+        self.host = self.remote.host
         self._base_url = conf['url']
 
     def _open(self):
@@ -25,7 +29,7 @@ class Page(object):
         self.driver.get(self._base_url)
         self.driver.maximize_window()
         self.driver.implicitly_wait(10)
-        time.sleep(2)
+        time.sleep(1)
         assert self.on_page() == True, "The page does not open correctly"
 
     def open(self):
@@ -66,7 +70,7 @@ class Page(object):
             if click_first:
                 self.find_element(*loc).click()
             self.find_element(*loc).send_keys(value)
-            time.sleep(2)
+            time.sleep(1)
         except AttributeError:
             self._logger.error('%s page does not have "%s" locator' % loc)
 

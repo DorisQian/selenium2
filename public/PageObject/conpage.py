@@ -14,7 +14,8 @@ class ConPage(Page):
 		self.find_element(By.LINK_TEXT, u'系统配置').click()
 
 	def function_conf(self):
-		self.find_element(By.LINK_TEXT, u'功能配置').click()
+		self.driver.switch_to.frame('menu-iframe')
+		self.find_element(By.LINK_TEXT, u' 功能配置').click()
 
 	def manufacturer(self):
 		self.find_element(By.LINK_TEXT, u' 厂商管理').click()
