@@ -49,6 +49,7 @@ class TestLogin(unittest.TestCase):
 			self.logger.warning("assert failed: %s" % msg)
 			self.driver.get_screenshot_as_file(
 				'../images/test_null_all_%s.png' % self.now)
+			raise
 
 	def test_null_username(self):
 		u"""用户名为空"""
@@ -67,6 +68,7 @@ class TestLogin(unittest.TestCase):
 			self.logger.warning("assert failed: %s" % msg)
 			self.driver.get_screenshot_as_file(
 				'../images/test_null_username_%s.png' % self.now)
+			raise
 
 	def test_null_password(self):
 		u"""密码为空"""
@@ -85,6 +87,7 @@ class TestLogin(unittest.TestCase):
 			self.logger.warning("assert failed: %s" % msg)
 			self.driver.get_screenshot_as_file(
 				'../images/test_null_password_%s.png' % self.now)
+			raise
 
 	def test_null_security(self):
 		u"""验证码为空"""
@@ -103,6 +106,7 @@ class TestLogin(unittest.TestCase):
 			self.logger.warning("assert failed: %s" % msg)
 			self.driver.get_screenshot_as_file(
 				'../images/test_null_security_%s.png' % self.now)
+			raise
 
 	def test_username_wrong(self):
 		u"""用户名不存在"""
@@ -121,6 +125,7 @@ class TestLogin(unittest.TestCase):
 			self.logger.warning("assert failed: %s" % msg)
 			self.driver.get_screenshot_as_file(
 				'../images/test_username_wrong_%s.png' % self.now)
+			raise
 
 	def test_user_lock(self):
 		u"""用户锁定"""
@@ -145,6 +150,7 @@ class TestLogin(unittest.TestCase):
 				self.logger.warning("assert failed: %s" % msg)
 				self.driver.get_screenshot_as_file(
 					'../images/test_user_lock_%s.png' % self.now)
+				raise
 		service_url = conf['service_url'] + 'UUMSystemService?wsdl'
 		client = Client(service_url)
 		param = {'userId': 19, 'state': 0}
@@ -168,6 +174,7 @@ class TestLogin(unittest.TestCase):
 			self.logger.warning("assert failed: %s" % msg)
 			self.driver.get_screenshot_as_file(
 				'../images/test_z_success_login_%s.png' % self.now)
+			raise
 
 	def test_z_success_logout(self):
 		u"""成功登出"""
@@ -180,6 +187,7 @@ class TestLogin(unittest.TestCase):
 			self.logger.warning("assert failed: %s" % msg)
 			self.driver.get_screenshot_as_file(
 				'../images/test_z_success_logout_%s.png' % self.now)
+			raise
 
 	@classmethod
 	def tearDownClass(cls):
