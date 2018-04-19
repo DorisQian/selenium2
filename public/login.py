@@ -15,6 +15,7 @@ class Login:
     def __init__(self):
         self.logger = log(os.path.basename(__file__))
         self.browser = LoginPage()
+        self.driver = self.browser.driver
 
     def login(self):
         self.browser.open()
@@ -23,4 +24,9 @@ class Login:
         self.browser.type_security('abcd')
         self.browser.login()
         self.browser.kick_user()
+        self.driver.implicitly_wait(10)
         self.logger.info('login soc')
+
+if __name__ == '__main__':
+    a = Login()
+    a.login()
