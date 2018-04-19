@@ -9,14 +9,14 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from email.header import Header
-from .log import Logger
+from public.log import log
 
 __author__ = 'Doris'
 
 
 class SendMail:
 
-    logger = Logger('INFO')
+    logger = log(os.path.basename(__file__))
     now = time.strftime('%Y-%m-%d')
 
     def send_mail(self, msg, flag, remote_host):

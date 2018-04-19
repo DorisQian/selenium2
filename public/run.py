@@ -5,15 +5,15 @@ import unittest
 import time
 import logging
 import os
-from public.log import Logger
+from public.log import log
 import HTMLTestRunnerCN
 from public.send_mail import SendMail
-from conf.remote import RemoteDriver
+from public.PageObject.page import Page
 
 __author__ = "Doris Qian"
 
 
-logger = Logger('DEBUG')
+logger = log(os.path.basename(__file__))
 
 
 def createsuit():
@@ -26,7 +26,7 @@ def createsuit():
     return testunit
 
 # 获取remote主机和浏览器
-remote = RemoteDriver()
+remote = Page()
 host = (remote.host, remote.browser)
 
 now = time.strftime("%Y-%m-%d_%H-%M-%S")
