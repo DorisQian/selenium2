@@ -16,6 +16,11 @@ class LoginPage(Page):
 	_password_loc = (By.ID, 'txtPassword')
 	_security_loc = (By.ID, 'txtSecurityCode')
 	_login_button = (By.CLASS_NAME, 'loginbutton')
+	_confirm_window = (By.CLASS_NAME, 'jetsen-window')
+	_kick = (By.XPATH, '//*[@id="jetsen-confirm_button"]/input[2]')
+
+	def __init__(self):
+		super(LoginPage, self).__init__()
 
 	def type_username(self, username):
 		self.send_keys(*self._username_loc, value=username)
@@ -29,3 +34,9 @@ class LoginPage(Page):
 	def login(self):
 		self.find_element(*self._login_button).click()
 
+	def kick_user(self):
+		try:
+			self.find_element(*self._confirm_window)
+			self.find_element(*self._kick).click()
+		except Exception:
+			pass
