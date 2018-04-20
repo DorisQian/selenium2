@@ -12,7 +12,6 @@ class RemoteDriver:
     logger = log(os.path.basename(__file__))
 
     for host, browser in _lists.items():
-        host = host.rstrip('/wd/hub')
         browser = browser
         logger.info('host:%s,browser:%s' % (host, browser))
         driver = Remote(command_executor=host,
