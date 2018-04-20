@@ -22,6 +22,7 @@ class Page(object):
         self.remote = RemoteDriver()
         self.driver = self.remote.driver
         self.host = self.remote.host
+        self.browser = self.remote.browser
         self._base_url = conf['url']
 
     def _open(self):
