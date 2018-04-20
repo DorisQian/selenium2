@@ -38,7 +38,7 @@ logger.info('generated testing report: %s' % filename)
 
 runner = HTMLTestRunnerCN.HTMLTestRunner(
     stream=fp,
-    title=u'新浪邮箱测试报告',
+    title=u'SOC-UI测试报告',
     tester=u'Doris')
 
 if __name__ == '__main__':
