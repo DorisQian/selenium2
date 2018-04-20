@@ -191,5 +191,5 @@ class TestLogin(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		cls.browser.close()
+		# cls.driver.quit()
 		cls.data.close()
