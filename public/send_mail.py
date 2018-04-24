@@ -30,9 +30,16 @@ class SendMail:
         remote = remote_host[0]
         browser = remote_host[1]
 
+        html = '''
+                <html><body><h1>测试报告链接</h1><p>link <a href="http://172.17.1.213:8080/job/test_ui/测试报告/">report</a>...</p>
+                <p><img src="cid:0"></p>
+                </body></html>
+                '''
+
         with open(msg, 'rb') as f:
             report = f.read()
         message = MIMEMultipart()
+        message.attach(MIMEText(html, 'html', 'utf-8'))
         message.attach(MIMEText(report, 'html', 'utf-8'))
         message['From'] = Header('doris_test@sina.com')
         message['To'] = Header('1609047552@qq.com', 'utf-8')

@@ -4,7 +4,6 @@
 import logging
 import time
 import os
-import re
 from logging import handlers
 
 
@@ -16,7 +15,7 @@ def log(name):
     logger = logging.getLogger(name)
     logger.setLevel('INFO')
 
-    path = os.getcwd().split('sele')[0] + 'sele' + os.sep + 'logs' + os.sep
+    path = os.getcwd().split('selenium2')[0] + 'selenium2' + os.sep + 'logs' + os.sep
     file = path + 'ui'
 
     ch = logging.StreamHandler()
@@ -36,7 +35,7 @@ def log(name):
     return logger
 
 if __name__ == '__main__':
-
     logging = log('test')
     logging.info('test')
+
 
