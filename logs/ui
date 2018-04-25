@@ -1,0 +1,23 @@
+2018-04-20 17:36:41,787 INFO [send_mail.py:83]  none of wrong images
+2018-04-20 17:36:41,788 INFO [send_mail.py:69]  the newest report is http-chrome2018-04-20_17-36-12_result.html
+2018-04-20 17:36:41,788 INFO [send_mail.py:71]  preparing send report /home/ubuntu/study/selenium2/reports/http-chrome2018-04-20_17-36-12_result.html
+2018-04-20 17:36:41,841 INFO [send_mail.py:45]  attach reports
+2018-04-20 17:36:42,490 INFO [send_mail.py:60]  send email to 1609047552@qq.com successful
+2018-04-20 17:44:15,765 INFO [remote.py:16]  host:http://172.17.1.205:5556/wd/hub,browser:chrome
+2018-04-20 17:44:17,766 INFO [run.py:37]  generated testing report: /home/ubuntu/study/selenium2/reports/http-chrome2018-04-20_17-44-17_result.html
+2018-04-20 17:44:17,836 INFO [test_manufacturer.py:25]  start test manufacturer
+2018-04-20 17:44:17,837 INFO [dataConnect.py:120]  select count(1) from bmp_manufacturers where 1=1
+2018-04-20 17:44:25,252 INFO [login.py:28]  login soc
+2018-04-20 17:44:36,382 INFO [test_manufacturer.py:164]  test_add_null_name
+2018-04-20 17:44:38,263 INFO [test_manufacturer.py:237]  test_add_repeat_model
+2018-04-20 17:44:38,322 INFO [test_manufacturer.py:253]  test_add_success_manu
+2018-04-20 17:44:38,363 INFO [test_manufacturer.py:284]  test_add_success_model
+2018-04-20 17:44:38,404 INFO [test_manufacturer.py:53]  test_null_query
+2018-04-20 17:44:38,476 INFO [test_manufacturer.py:61]  test_turn_page_order
+2018-04-20 17:44:38,606 INFO [dataConnect.py:95]  select FIELD_1 from bmp_manufacturers where 1=1 limit 0, 1
+2018-04-20 17:44:38,718 INFO [test_manufacturer.py:309]  test_update_repeat_model
+2018-04-20 17:44:38,962 INFO [send_mail.py:83]  none of wrong images
+2018-04-20 17:44:38,962 INFO [send_mail.py:69]  the newest report is http-chrome2018-04-20_17-44-17_result.html
+2018-04-20 17:44:38,962 INFO [send_mail.py:71]  preparing send report /home/ubuntu/study/selenium2/reports/http-chrome2018-04-20_17-44-17_result.html
+2018-04-20 17:44:38,965 INFO [send_mail.py:45]  attach reports
+2018-04-20 17:44:39,441 INFO [send_mail.py:60]  send email to 1609047552@qq.com successful

@@ -1,0 +1,12 @@
+2018-04-20 17:36:08,839 INFO [remote.py:16]  host:http://172.17.1.205:5556/wd/hub,browser:chrome
+2018-04-20 17:36:12,524 INFO [run.py:37]  generated testing report: /home/ubuntu/study/selenium2/reports/http-chrome2018-04-20_17-36-12_result.html
+2018-04-20 17:36:13,129 INFO [test_manufacturer.py:25]  start test manufacturer
+2018-04-20 17:36:18,304 INFO [dataConnect.py:120]  select count(1) from bmp_manufacturers where 1=1
+2018-04-20 17:36:25,723 INFO [login.py:28]  login soc
+2018-04-20 17:36:38,932 INFO [test_manufacturer.py:164]  test_add_null_name
+2018-04-20 17:36:40,977 INFO [test_manufacturer.py:237]  test_add_null_name
+2018-04-20 17:36:41,090 INFO [test_manufacturer.py:253]  test_add_null_name
+2018-04-20 17:36:41,136 INFO [test_manufacturer.py:284]  test_add_success_model
+2018-04-20 17:36:41,179 INFO [test_manufacturer.py:53]  test_null_query
+2018-04-20 17:36:41,251 INFO [test_manufacturer.py:61]  test_turn_page_order
+2018-04-20 17:36:41,352 INFO [dataConnect.py:95]  select FIELD_1 from bmp_manufacturers where 1=1 limit 0, 1
