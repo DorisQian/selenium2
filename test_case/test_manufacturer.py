@@ -51,6 +51,7 @@ class Manufacturer(unittest.TestCase):
 		self.logger.info('test_null_query')
 		records = self.data.count('bmp_manufacturers')
 		page = math.ceil(records / 20)
+		# time.sleep(1)
 		self.driver.find_element(By.CLASS_NAME, 'aui-btn-save').click()
 		time.sleep(1)
 		judge = '一共%s页,共%s条记录' % (page, records)
@@ -66,7 +67,7 @@ class Manufacturer(unittest.TestCase):
 		for p in range(page):
 			judge = []
 			for n in range(1, page + 1):
-				time.sleep(1)
+				# time.sleep(1)
 				style = WebDriverWait(self.driver, 30).until(
 					EC.presence_of_element_located((By.XPATH, '//*[@id="divManPage"]/span[%s]' % n))).get_attribute('style')
 				if style:
@@ -94,6 +95,7 @@ class Manufacturer(unittest.TestCase):
 				self.logger.error(msg)
 				raise
 			if p != page - 1:
+				time.sleep(1)
 				self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[3]').click()
 
 		# 顺序向前翻页
@@ -119,6 +121,8 @@ class Manufacturer(unittest.TestCase):
 					raise
 			mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='%s, 1' % (p * 20 - 20))
 			ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+			if ui_model == ' ':
+				ui_model = None
 			try:
 				self.assertEqual(mysql_model, ui_model)
 			except Exception as msg:
@@ -132,6 +136,8 @@ class Manufacturer(unittest.TestCase):
 			self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/span[2]').click()
 			mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='20, 1')
 			ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+			if ui_model == ' ':
+				ui_model = None
 			try:
 				self.assertEqual(ui_model, mysql_model)
 			except Exception as msg:
@@ -143,6 +149,8 @@ class Manufacturer(unittest.TestCase):
 			self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[1]').click()  # 跳转到第一页
 			mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='1')
 			ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+			if ui_model == ' ':
+				ui_model = None
 			try:
 				self.assertEqual(mysql_model, ui_model)
 			except Exception as msg:
@@ -151,6 +159,8 @@ class Manufacturer(unittest.TestCase):
 		self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[4]').click()  # 跳转到最后一页
 		mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='%s, 1' % (page * 20 - 20))
 		ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+		if ui_model == ' ':
+			ui_model = None
 		try:
 			self.assertEqual(ui_model, mysql_model)
 		except Exception as msg:
@@ -159,6 +169,8 @@ class Manufacturer(unittest.TestCase):
 		self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[1]').click()  # 跳转到第一页
 		mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='1')
 		ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+		if ui_model == ' ':
+			ui_model = None
 		try:
 			self.assertEqual(ui_model, mysql_model)
 		except Exception as msg:
@@ -303,7 +315,9 @@ class Manufacturer(unittest.TestCase):
 			self.driver.get_screenshot_as_file(u'../images/model_add&save_s_%s.png' % self.now)
 			raise
 		# 添加
-		self.browser.send_keys(*(By.ID, 'txt_MAN_KIND'), value='test型号add2')
+		# time.sleep(1)
+		self.driver.find_element(By.ID, 'txt_MAN_KIND').send_keys('test型号add2')
+		# self.browser.send_keys(*(By.ID, 'txt_MAN_KIND'), value='test型号add2')
 		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
 		text = self.driver.find_element(By.XPATH, '//*[@id="divTop"]/table/tbody/tr/td/div[1]/label').text
 		self.data.commit()
@@ -317,6 +331,7 @@ class Manufacturer(unittest.TestCase):
 	def test_update_repeat_model(self):
 		u"""测试修改型号相同"""
 		self.logger.info('test_update_repeat_model')
+		time.sleep(1)
 		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[4]/a/img').click()
 		text = self.driver.find_element(By.ID, 'edit-object-win_title_text').text
 		try:
@@ -345,7 +360,9 @@ class Manufacturer(unittest.TestCase):
 		page = math.ceil(records / 20)
 		count = records - 20 * (page - 1) - 3
 		limit = records - 4
-		self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[4]').click()
+		WebDriverWait(self.driver, 30).until(
+			EC.presence_of_element_located((By.XPATH, '//*[@id="divManPage"]/img[4]'))).click()
+		# self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[4]').click()
 		time.sleep(2)
 		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[%s]/td[4]/a/img' % count).click()
 		self.driver.find_element(By.XPATH, '//*[@id="txt_DATA_TYPE"]').click()
@@ -405,6 +422,7 @@ class Manufacturer(unittest.TestCase):
 		u"""测试取消删除"""
 		self.logger.info('test_z_delete_cancel')
 		records = self.data.count('bmp_manufacturers')
+		time.sleep(1)
 		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[5]/img').click()
 		self.driver.find_element(By.XPATH, '//*[@id="jetsen-confirm_button"]/input[2]').click()
 		self.data.commit()
@@ -418,7 +436,9 @@ class Manufacturer(unittest.TestCase):
 	def test_z_delete_success(self):
 		u"""测试成功删除厂商"""
 		self.logger.info('test_z_delete_success')
-		self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[4]').click()
+		WebDriverWait(self.driver, 30).until(
+			EC.presence_of_element_located((By.XPATH, '//*[@id="divManPage"]/img[4]'))).click()
+		# self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[4]').click()
 		time.sleep(1)
 		self.data.commit()
 		records = self.data.count('bmp_manufacturers')
@@ -426,20 +446,21 @@ class Manufacturer(unittest.TestCase):
 		count = records - 20 * (page - 1) - 3
 		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[%s]/td[5]/img' % count).click()
 		self.driver.find_element(By.XPATH, '//*[@id="jetsen-confirm_button"]/input[1]').click()
+		time.sleep(1)
 		self.data.commit()
 		records_after = self.data.count('bmp_manufacturers')
 		try:
-			self.assertEqual(records - 1, records_after)
+			self.assertEqual(records_after, records - 1)
+			self.data.delete('bmp_manufacturers', where_dict={'FIELD_1': 'test型号add2'})
+			self.data.delete('bmp_manufacturers', where_dict={'MAN_NAME': 'test厂商add2'})
+			self.data.delete('bmp_manufacturers', where_dict={'FIELD_1': 'test型号修改2'})
 		except Exception as msg:
 			self.logger.warning("assert failed: %s" % msg)
 			raise
-		self.data.delete('bmp_manufacturers', where_dict={'FILED_1': 'test型号add2'})
-		self.data.delete('bmp_manufacturers', where_dict={'MAN_NAME': 'test厂商add2'})
-		self.data.delete('bmp_manufacturers', where_dict={'FILED_1': 'test型号修改2'})
 
 	def test_z_delete_used(self):
 		self.logger.info('test_z_delete_used')
-		time.sleep(1)
+		# time.sleep(2)
 		self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[1]').click()  # 跳转到第一页
 		time.sleep(1)
 		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[5]/img').click()
