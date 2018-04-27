@@ -22,3 +22,6 @@ class ConPage(Page):
 	def manufacturer(self):
 		self.find_element(By.LINK_TEXT, u' 厂商管理').click()
 
+	def keyattention(self):
+		self.find_element(By.LINK_TEXT, u' 重点关注').click()
+
