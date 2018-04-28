@@ -9,8 +9,10 @@ from selenium.webdriver.common.by import By
 
 class ConPage(Page):
 	u"""系统配置页面封装"""
+	'''
 	def __init__(self):
 		super(ConPage, self).__init__()
+	'''
 
 	def sys_conf(self):
 		self.find_element(By.LINK_TEXT, u'系统配置').click()
@@ -21,7 +23,4 @@ class ConPage(Page):
 
 	def manufacturer(self):
 		self.find_element(By.LINK_TEXT, u' 厂商管理').click()
-
-	def keyattention(self):
-		self.find_element(By.LINK_TEXT, u' 重点关注').click()
 
