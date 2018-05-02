@@ -8,8 +8,6 @@ from public.PageObject.keyattentionPage import KeyAttentionPage
 from public.PageObject.conpage import ConPage
 from public.dataConnect import Database
 from public.login import Login
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import unittest
 import xlrd
 import math
@@ -51,9 +49,9 @@ class KeyAttention(unittest.TestCase):
 	def test_null_query(self):
 		u"""测试查询条件为空时查询"""
 		self.logger.info('test_null_query')
+		time.sleep(1)
 		records = self.data.count(self.tablename)
 		page = math.ceil(records / 20)
-		# time.sleep(1)
 		self.browser.search()
 		time.sleep(1)
 		judge = '一共%s页,共%s条记录' % (page, records)
@@ -80,6 +78,7 @@ class KeyAttention(unittest.TestCase):
 		# 分类名称
 		name = self.name[2]
 		try:
+			time.sleep(1)
 			self.browser.type_name(name)
 			self.browser.sure_press()
 			text = self.browser.tips()
@@ -95,6 +94,7 @@ class KeyAttention(unittest.TestCase):
 		self.logger.info('test_add_null_z_level')
 		a_type = self.attention_type[3]
 		try:
+			time.sleep(1)
 			self.browser.attention_type(a_type)
 			self.browser.sure_press()
 			text = self.browser.tips()
@@ -111,6 +111,7 @@ class KeyAttention(unittest.TestCase):
 		name = self.name[4]
 		level = self.loophole_level[4]
 		try:
+			time.sleep(1)
 			self.browser.type_name(name)
 			self.browser.loophole_level(level)
 			self.browser.sure_press()
@@ -127,20 +128,25 @@ class KeyAttention(unittest.TestCase):
 		self.logger.info('test_add_repeat')
 		name = self.name[6]
 		virus_type = self.virus_type[6]
+		time.sleep(1)
 		self.browser.type_name(name)
 		self.browser.type_virus_type(virus_type)
 		self.browser.sure_press()
+		self.data.commit()
+		time.sleep(1)
 		text = self.browser.get_label()
 		key_id = self.data.select(self.tablename, fields=['id'], where_dic={'attention_name': name})
 		try:
 			self.assertEqual(u'重点关注', text)
-			if key_id.isdigit():
+			print(text)
+			if str(key_id).isdigit():
 				pass
 			else:
 				raise AssertionError('add keyattention failed')
 		except Exception as msg:
 			self.logger.warning(msg)
 			self.driver.get_screenshot_as_file('../images/keyattention_add_success_%s.png' % self.now)
+			raise
 
 	def test_add_cancel(self):
 		u"""测试取消添加"""
@@ -151,19 +157,22 @@ class KeyAttention(unittest.TestCase):
 		a_type = self.attention_type[5]
 		level = self.loophole_level[5]
 		try:
+			time.sleep(1)
 			self.browser.type_name(name)
 			self.browser.type_virus_type(virus_type)
 			self.browser.attention_type(a_type)
 			self.browser.loophole_level(level)
 			self.browser.cancel_press()
+			time.sleep(1)
 			text = self.browser.get_label()
 			self.assertEqual(u'重点关注', text)
 			key_id = self.data.select('nmp_keyattention', fields=['id'], where_dic={'attention_name': '测试UI添加重点关注'})
-			if key_id.isdigit():
-				raise AssertionError('add keyattention failed')
+			if str(key_id).isdigit():
+				raise AssertionError('test_add_cancel failed!')
 		except Exception as msg:
 			self.logger.warning(msg)
 			self.driver.get_screenshot_as_file('../images/keyattention_add_cancel_%s.png' % self.now)
+			raise
 
 	def test_update_repeat(self):
 		u"""测试修改为同类型名称相同"""
@@ -171,7 +180,6 @@ class KeyAttention(unittest.TestCase):
 		name = self.name[11]
 		sql_name = self.name[6]
 		name_list = self.data.select(self.tablename, fields=['attention_name'])
-		print(name_list)
 		index = name_list.index(sql_name)
 		try:
 			self.browser.update_press(index + 1)
@@ -179,6 +187,7 @@ class KeyAttention(unittest.TestCase):
 			self.browser.sure_press()
 			text = self.browser.tips()
 			self.assertEqual(u'同分类下关注名称不能相同!', text)
+			self.browser.know_press()
 		except Exception as msg:
 			self.logger.warning(msg)
 			self.driver.get_screenshot_as_file('../images/keyattention_repeat_up_%s.png' % self.now)
@@ -190,48 +199,49 @@ class KeyAttention(unittest.TestCase):
 		name = self.name[12]
 		a_type = self.attention_type[12]
 		try:
+			time.sleep(1)
 			self.browser.type_name(name)
 			self.browser.attention_type(a_type)
 			self.browser.sure_press()
+			self.data.commit()
 			text = self.browser.get_label()
 			sql_value = self.data.select(self.tablename, fields=['log_type'], where_dic={'attention_name': name})
 			self.assertEqual(u'重点关注', text)
-			self.assertEqual('(2,3)', sql_value)
+			self.assertEqual('[2, 3]', str(sql_value))
 		except Exception as msg:
 			self.logger.info(msg)
 			self.driver.get_screenshot_as_file('../images/keyattention_up_success_%s.png' % self.now)
+			raise
 
 	def test_z_delete_cancel(self):
 		u"""测试取消删除"""
 		self.logger.info('test_z_delete_cancel')
-		name = self.name[13]
-		name_list = self.data.select(self.tablename, fields=['attention_name'])
-		index = name_list.index(name)
+		count_before = self.data.count(self.tablename)
 		try:
-			count_before = self.data.count(self.tablename)
-			self.browser.delete_press(index + 1)
-			self.browser.cancel_press()
 			time.sleep(1)
+			self.browser.delete_press(count_before)
+			self.browser.cancel_press()
+			self.data.commit()
 			count_after = self.data.count(self.tablename)
 			self.assertEqual(count_after, count_before)
 		except Exception as msg:
 			self.logger.warning(msg)
+			raise
 
 	def test_z_delete_success(self):
 		u"""测试删除成功"""
 		self.logger.info('test_z_delete_success')
-		name = self.name[14]
-		name_list = self.data.select(self.tablename, fields=['attention_name'])
-		index = name_list.index(name)
+		count_before = self.data.count(self.tablename)
 		try:
-			count_before = self.data.count(self.tablename)
-			self.browser.delete_press(index + 1)
+			self.browser.delete_press(count_before)
 			self.browser.sure_press()
 			time.sleep(1)
+			self.data.commit()
 			count_after = self.data.count(self.tablename)
-			self.assertEqual(count_after, count_before + 1)
+			self.assertEqual(count_after, count_before - 1)
 		except Exception as msg:
 			self.logger.warning(msg)
+			raise
 
 	@classmethod
 	def tearDownClass(cls):
