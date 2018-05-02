@@ -1,4 +1,6 @@
 #python
 *.pyc
 .DS_Store
+.idea/
+__pycache__
 

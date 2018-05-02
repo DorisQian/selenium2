@@ -31,7 +31,7 @@ class SendMail:
         browser = remote_host[1]
 
         html = '''
-                <html><body><h1>测试报告链接</h1><p>link <a href="http://172.17.1.213:8080/job/test_ui/测试报告/">report</a>...</p>
+                <html><body><h1>测试报告链接</h1><p>link <a href="http://172.17.1.213:8080/job/test_selenium2/测试报告/">report</a>...</p>
                 <p><img src="cid:0"></p>
                 </body></html>
                 '''
