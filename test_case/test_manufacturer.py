@@ -5,12 +5,11 @@ __author__ = 'Doris Qian'
 
 from public.log import log
 from public.PageObject.conpage import ConPage
+from public.PageObject.manufacturerPage import ManufacturerPage
 from public.dataConnect import Database
 from public.login import Login
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import unittest
+import xlrd
 import math
 import time
 import os
@@ -23,53 +22,53 @@ class Manufacturer(unittest.TestCase):
 	def setUpClass(cls):
 		cls.logger = log(os.path.basename(__file__))
 		cls.logger.info('start test manufacturer')
+		cls.tablename = 'bmp_manufacturers'
 		cls.now = time.strftime('%Y-%m-%d')
+		file = os.path.abspath('..') + os.sep + 'conf' + os.sep + 'cases.xlsx'
+		data = xlrd.open_workbook(file)
+		sheet = data.sheet_by_name(u'厂商管理')
+		cls.name = sheet.col_values(6)
+		cls.description = sheet.col_values(7)
+		cls.model = sheet.col_values(8)
 		cls.data = Database()
 		cls.login = Login()
 		cls.login.login()
-		cls.browser = ConPage()
+		cls.con = ConPage()
+		cls.browser = ManufacturerPage()
 		cls.driver = cls.browser.driver
-		try:
-			cls.browser.sys_conf()
-			cls.driver.implicitly_wait(10)
-			cls.browser.function_conf()
-			cls.driver.implicitly_wait(10)
-			cls.browser.manufacturer()
-			cls.driver.implicitly_wait(10)
-			cls.driver.switch_to.frame('iframepage')
-			cls.driver.implicitly_wait(10)
-			text = cls.driver.find_element(By.XPATH, '//*[@id="divTop"]/table/tbody/tr/td/div[1]/label').text
-			assert text == u'厂商管理'
-		except Exception as msg:
-			cls.logger.warning("assert failed: %s" % msg)
-			cls.driver.get_screenshot_as_file(
-				'../images/manufacturer_%s.png' % cls.now)
-			raise
+		cls.con.sys_conf()
+		cls.driver.implicitly_wait(10)
+		cls.con.function_conf()
+		cls.driver.implicitly_wait(10)
+		cls.browser.manufacturer()
+		cls.driver.implicitly_wait(10)
+		cls.driver.switch_to.frame('iframepage')
+		cls.driver.implicitly_wait(10)
 
 	def test_null_query(self):
 		u"""测试查询条件为空时查询"""
 		self.logger.info('test_null_query')
-		records = self.data.count('bmp_manufacturers')
+		records = self.data.count(self.tablename)
 		page = math.ceil(records / 20)
-		# time.sleep(1)
-		self.driver.find_element(By.CLASS_NAME, 'aui-btn-save').click()
+		self.browser.search()
 		time.sleep(1)
 		judge = '一共%s页,共%s条记录' % (page, records)
-		text = self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/div').text
+		text = self.browser.page_info()
 		self.assertEqual(text, judge)
 
 	def test_turn_page(self):
 		u"""测试顺序翻页"""
 		self.logger.info('test_turn_page_order')
-		records = self.data.count('bmp_manufacturers')
+		records = self.data.count(self.tablename)
 		page = math.ceil(records / 20)
 		# 顺序向后翻页
 		for p in range(page):
 			judge = []
 			for n in range(1, page + 1):
 				# time.sleep(1)
-				style = WebDriverWait(self.driver, 30).until(
-					EC.presence_of_element_located((By.XPATH, '//*[@id="divManPage"]/span[%s]' % n))).get_attribute('style')
+				#style = WebDriverWait(self.driver, 30).until(
+					#EC.presence_of_element_located((By.XPATH, '//*[@id="divManPage"]/span[%s]' % n))).get_attribute('style')
+				style = self.browser.getattribute(n)
 				if style:
 					judge.append('1')
 				else:
@@ -85,8 +84,8 @@ class Manufacturer(unittest.TestCase):
 					self.driver.get_screenshot_as_file(
 						u'../images/manufacturer_顺序向后翻页第%s页_%s.png' % (j + 1, self.now))
 					raise
-			mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='%s, 1' % ((p + 1) * 20 - 20))
-			ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+			mysql_model = self.data.select(self.tablename, ['FIELD_1'], limit='%s, 1' % ((p + 1) * 20 - 20))
+			ui_model = self.browser.get_model(1)
 			if ui_model == ' ':
 				ui_model = None
 			try:
@@ -96,13 +95,13 @@ class Manufacturer(unittest.TestCase):
 				raise
 			if p != page - 1:
 				time.sleep(1)
-				self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[3]').click()
+				self.browser.next_page()
 
 		# 顺序向前翻页
 		for p in range(page, 0, -1):
 			judge = []
 			for n in range(page, 0, -1):
-				style = self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/span[%s]' % n).get_attribute('style')
+				style = self.browser.getattribute(n)
 				if style:
 					judge.append('1')
 				else:
@@ -119,8 +118,8 @@ class Manufacturer(unittest.TestCase):
 					self.driver.get_screenshot_as_file(
 						u'../images/manufacturer_顺序向前翻页，第%s页_%s.png' % (j, self.now))
 					raise
-			mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='%s, 1' % (p * 20 - 20))
-			ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+			mysql_model = self.data.select(self.tablename, ['FIELD_1'], limit='%s, 1' % (p * 20 - 20))
+			ui_model = self.browser.get_model(1)
 			if ui_model == ' ':
 				ui_model = None
 			try:
@@ -129,13 +128,13 @@ class Manufacturer(unittest.TestCase):
 				self.logger.error(msg)
 				raise
 			if p != 1:
-				self.driver.find_element(By.XPATH, '// *[ @ id = "divManPage"]/img[2]').click()
+				self.browser.previous_page()
 
 		# 跳转翻页 + 第一页最后一页
 		if page > 1:
-			self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/span[2]').click()
-			mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='20, 1')
-			ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+			self.browser.turn_page(2)
+			mysql_model = self.data.select(self.tablename, ['FIELD_1'], limit='20, 1')
+			ui_model = self.browser.get_model(1)
 			if ui_model == ' ':
 				ui_model = None
 			try:
@@ -146,9 +145,9 @@ class Manufacturer(unittest.TestCase):
 					u'../images/manufacturer_跳转到第二页_%s.png' % self.now)
 				raise
 
-			self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[1]').click()  # 跳转到第一页
-			mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='1')
-			ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+			self.browser.first_page()
+			mysql_model = self.data.select(self.tablename, ['FIELD_1'], limit='1')
+			ui_model = self.browser.get_model(1)
 			if ui_model == ' ':
 				ui_model = None
 			try:
@@ -156,9 +155,9 @@ class Manufacturer(unittest.TestCase):
 			except Exception as msg:
 				self.logger.error(msg)
 				raise
-		self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[4]').click()  # 跳转到最后一页
-		mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='%s, 1' % (page * 20 - 20))
-		ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+		self.browser.last_page()  # 跳转到最后一页
+		mysql_model = self.data.select(self.tablename, ['FIELD_1'], limit='%s, 1' % (page * 20 - 20))
+		ui_model = self.browser.get_model(1)
 		if ui_model == ' ':
 			ui_model = None
 		try:
@@ -166,9 +165,9 @@ class Manufacturer(unittest.TestCase):
 		except Exception as msg:
 			self.logger.error(msg)
 			raise
-		self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[1]').click()  # 跳转到第一页
-		mysql_model = self.data.select('bmp_manufacturers', ['FIELD_1'], limit='1')
-		ui_model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[3]').text
+		self.browser.first_page()  # 跳转到第一页
+		mysql_model = self.data.select(self.tablename, ['FIELD_1'], limit='1')
+		ui_model = self.browser.get_model(1)
 		if ui_model == ' ':
 			ui_model = None
 		try:
@@ -180,8 +179,8 @@ class Manufacturer(unittest.TestCase):
 	def test_add_null_name(self):
 		u"""测试添加厂商名称和型号为空"""
 		self.logger.info('test_add_null_name')
-		self.driver.find_element(By.XPATH, '//*[@id="divTop"]/table/tbody/tr/td/div[2]/button').click()
-		text = self.driver.find_element(By.ID, 'new-object-win_title_text').text
+		self.browser.add_press()
+		text = self.browser.windows_label()
 		try:
 			self.assertEqual(u'新建厂商 ', text)
 		except Exception as msg:
@@ -190,93 +189,96 @@ class Manufacturer(unittest.TestCase):
 			raise
 		# 型号
 		try:
-			self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-op').click()
-			alert = self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert-control-message"]').text
+			self.browser.save_add()
+			alert = self.browser.tips()
 			self.assertEqual(u'设备型号不能为空！', alert)
-			self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert_button"]/input').click()
+			self.browser.know_press()
 		except Exception as msg:
 			self.logger.error(msg)
 			self.driver.get_screenshot_as_file(u'../images/manu_model_add&save_%s.png' % self.now)
 			raise
 		try:
-			self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
-			alert = self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert-control-message"]').text
+			self.browser.sure_press()
+			alert = self.browser.tips()
 			self.assertEqual(u'设备型号不能为空！', alert)
-			self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert_button"]/input').click()
+			self.browser.know_press()
 		except Exception as msg:
 			self.logger.error(msg)
 			self.driver.get_screenshot_as_file(u'../images/manu_model_save_%s.png' % self.now)
 			raise
 		# 厂商
-		self.driver.find_element(By.XPATH, '//*[@id="txt_DATA_TYPE"]').click()
-		self.driver.find_element(By.XPATH, '//*[@id="txt_DATA_TYPE"]/option[1]').click()
+		self.browser.data_type()
 		try:
-			self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-op').click()
-			alert = self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert-control-message"]').text
+			self.browser.save_add()
+			alert = self.browser.tips()
 			self.assertEqual(u'厂商名称不能为空！', alert)
-			self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert_button"]/input').click()
+			self.browser.know_press()
 		except Exception as msg:
 			self.logger.error(msg)
 			self.driver.get_screenshot_as_file(u'../images/manu_add&save_%s.png' % self.now)
 			raise
 		try:
-			self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
-			alert = self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert-control-message"]').text
+			self.browser.sure_press()
+			alert = self.browser.tips()
 			self.assertEqual(u'厂商名称不能为空！', alert)
-			self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert_button"]/input').click()
+			self.browser.know_press()
 		except Exception as msg:
 			self.logger.error(msg)
 			self.driver.get_screenshot_as_file(u'../images/manu_save_%s.png' % self.now)
 			raise
 		# 描述
-		self.driver.find_element(By.ID, 'txt_MAN_NAME').send_keys('test厂商add1')
+		name = self.name[10]
+		time.sleep(1)
 		try:
-			self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-op').click()
-			alert = self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert-control-message"]').text
+			self.browser.type_name(name)
+			self.browser.save_add()
+			alert = self.browser.tips()
 			self.assertEqual(u'描述不能为空！', alert)
-			self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert_button"]/input').click()
+			self.browser.know_press()
 		except Exception as msg:
 			self.logger.error(msg)
 			self.driver.get_screenshot_as_file(u'../images/manu_des_add&save_%s.png' % self.now)
 			raise
 		try:
-			self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
-			alert = self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert-control-message"]').text
+			self.browser.sure_press()
+			alert = self.browser.tips()
 			self.assertEqual(u'描述不能为空！', alert)
-			self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert_button"]/input').click()
+			self.browser.know_press()
 		except Exception as msg:
 			self.logger.error(msg)
 			self.driver.get_screenshot_as_file(u'../images/manu_des_save_%s.png' % self.now)
 			raise
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-cancel').click()
+		self.browser.cancel_press()
 
 	def test_add_repeat_model(self):
 		u"""测试添加重复型号"""
 		self.logger.info('test_add_repeat_model')
-		self.driver.find_element(By.XPATH, '//*[@id="divTop"]/table/tbody/tr/td/div[2]/button').click()
-		self.browser.send_keys(*(By.ID, 'txt_MAN_KIND'), value='500')
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
-		alert = self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert-control-message"]').text
+		model = self.model[11]
+		self.browser.add_press()
+		self.browser.type_model(model)
+		self.browser.sure_press()
+		alert = self.browser.tips()
 		try:
 			self.assertEqual(u'设备型号不能重复！', alert)
-			self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert_button"]/input').click()
+			self.browser.know_press()
 		except Exception as msg:
 			self.logger.warning("assert failed: %s" % msg)
 			self.driver.get_screenshot_as_file(u'../images/test_add_repeat_model_%s.png' % self.now)
 			raise
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-cancel').click()
+		self.browser.cancel_press()
 
 	def test_add_success_manu(self):
 		u"""测试成功添加厂商"""
 		self.logger.info('test_add_success_manu')
-		self.driver.find_element(By.XPATH, '//*[@id="divTop"]/table/tbody/tr/td/div[2]/button').click()
+		self.browser.add_press()
 		# 保存并添加
-		self.driver.find_element(By.XPATH, '//*[@id="txt_DATA_TYPE"]').click()
-		self.driver.find_element(By.XPATH, '//*[@id="txt_DATA_TYPE"]/option[1]').click()
-		self.browser.send_keys(*(By.ID, 'txt_MAN_NAME'), value='test厂商add1')
-		self.browser.send_keys(*(By.ID, 'txt_MAN_DESC'), value='test厂商描述1')
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-op').click()
-		text = self.driver.find_element(By.ID, 'new-object-win_title_text').text
+		self.browser.data_type()
+		name = self.name[14]
+		description = self.description[14]
+		self.browser.type_name(name)
+		self.browser.description(description)
+		self.browser.save_add()
+		text = self.browser.windows_label()
 		self.data.commit()
 		try:
 			self.assertEqual(u'新建厂商 ', text)
@@ -285,12 +287,13 @@ class Manufacturer(unittest.TestCase):
 			self.driver.get_screenshot_as_file(u'../images/manu_add&save_s_%s.png' % self.now)
 			raise
 		# 添加
-		self.driver.find_element(By.XPATH, '//*[@id="txt_DATA_TYPE"]').click()
-		self.driver.find_element(By.XPATH, '//*[@id="txt_DATA_TYPE"]/option[1]').click()
-		self.browser.send_keys(*(By.ID, 'txt_MAN_NAME'), value='test厂商add2')
-		self.browser.send_keys(*(By.ID, 'txt_MAN_DESC'), value='test厂商描述2')
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
-		text = self.driver.find_element(By.XPATH, '//*[@id="divTop"]/table/tbody/tr/td/div[1]/label').text
+		self.browser.data_type()
+		name = self.name[21]
+		description = self.description[21]
+		self.browser.type_name(name)
+		self.browser.description(description)
+		self.browser.sure_press()
+		text = self.browser.get_label()
 		self.data.commit()
 		try:
 			self.assertEqual(u'厂商管理', text)
@@ -302,11 +305,12 @@ class Manufacturer(unittest.TestCase):
 	def test_add_success_model(self):
 		u"""测试成功添加型号"""
 		self.logger.info('test_add_success_model')
-		self.driver.find_element(By.XPATH, '//*[@id="divTop"]/table/tbody/tr/td/div[2]/button').click()
+		self.browser.add_press()
 		# 保存并添加
-		self.browser.send_keys(*(By.ID, 'txt_MAN_KIND'), value='test型号add1')
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-op').click()
-		text = self.driver.find_element(By.ID, 'new-object-win_title_text').text
+		model = self.model[14]
+		self.browser.type_model(model)
+		self.browser.save_add()
+		text = self.browser.windows_label()
 		self.data.commit()
 		try:
 			self.assertEqual(u'新建厂商 ', text)
@@ -316,10 +320,10 @@ class Manufacturer(unittest.TestCase):
 			raise
 		# 添加
 		# time.sleep(1)
-		self.driver.find_element(By.ID, 'txt_MAN_KIND').send_keys('test型号add2')
-		# self.browser.send_keys(*(By.ID, 'txt_MAN_KIND'), value='test型号add2')
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
-		text = self.driver.find_element(By.XPATH, '//*[@id="divTop"]/table/tbody/tr/td/div[1]/label').text
+		model = self.model[21]
+		self.browser.type_model(model)
+		self.browser.sure_press()
+		text = self.browser.get_label()
 		self.data.commit()
 		try:
 			self.assertEqual(u'厂商管理', text)
@@ -332,51 +336,43 @@ class Manufacturer(unittest.TestCase):
 		u"""测试修改型号相同"""
 		self.logger.info('test_update_repeat_model')
 		time.sleep(1)
-		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[4]/a/img').click()
-		text = self.driver.find_element(By.ID, 'edit-object-win_title_text').text
-		try:
-			self.assertEqual(u'编辑厂商 ', text)
-		except Exception as msg:
-			self.logger.error(msg)
-			self.driver.get_screenshot_as_file(u'../images/test_update_repeat_model_%s.png' % self.now)
-		self.browser.send_keys(*(By.ID, 'txt_MAN_KIND'), value='C00')
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
-		alert = self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert-control-message"]').text
+		self.browser.update_press(value=1)
+		model = self.model[16]
+		self.browser.type_model(model)
+		self.browser.sure_press()
+		alert = self.browser.tips()
 		try:
 			self.assertEqual(u'设备型号不能重复！', alert)
-			self.driver.find_element(By.XPATH, '//*[@id="jetsen-alert_button"]/input').click()
-
+			self.browser.know_press()
 		except Exception as msg:
 			self.logger.warning("assert failed: %s" % msg)
 			self.driver.get_screenshot_as_file(u'../images/model_add_s_%s.png' % self.now)
 			raise
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-cancel').click()
+		self.browser.cancel_press()
 
 	def test_update_success(self):
 		u"""测试修改成功"""
 		# 修改厂商名称和描述
 		self.logger.info('test_update_success')
-		records = self.data.count('bmp_manufacturers')
+		records = self.data.count(self.tablename)
 		page = math.ceil(records / 20)
 		count = records - 20 * (page - 1) - 3
 		limit = records - 4
-		WebDriverWait(self.driver, 30).until(
-			EC.presence_of_element_located((By.XPATH, '//*[@id="divManPage"]/img[4]'))).click()
-		# self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[4]').click()
+		self.browser.last_page()
 		time.sleep(2)
-		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[%s]/td[4]/a/img' % count).click()
-		self.driver.find_element(By.XPATH, '//*[@id="txt_DATA_TYPE"]').click()
-		self.driver.find_element(By.XPATH, '//*[@id="txt_DATA_TYPE"]/option[1]').click()
-		self.browser.send_keys(*(By.ID, 'txt_MAN_NAME'), value='test厂商add3')
-		self.browser.send_keys(*(By.ID, 'txt_MAN_DESC'), value='test厂商描述3')
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
+		self.browser.update_press(count)
+		self.browser.data_type()
+		name = self.name[17]
+		description = self.description[17]
+		self.browser.type_name(name)
+		self.browser.description(description)
+		self.browser.sure_press()
 		time.sleep(1)
-		manu_name = WebDriverWait(self.driver, 30).until(
-			EC.presence_of_element_located((By.XPATH, '//*[@id="tabMan"]/tbody/tr[%s]/td[1]' % count))).text
-		manu_des = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[%s]/td[2]' % count).text
+		manu_name = self.browser.get_name(count)
+		manu_des = self.browser.get_desc(count)
 		self.data.commit()
-		manu_sql = self.data.select('bmp_manufacturers', fields=['MAN_NAME'], limit='%s, 1' % limit)
-		des_sql = self.data.select('bmp_manufacturers', fields=['MAN_DESC'], limit='%s, 1' % limit)
+		manu_sql = self.data.select(self.tablename, fields=['MAN_NAME'], limit='%s, 1' % limit)
+		des_sql = self.data.select(self.tablename, fields=['MAN_DESC'], limit='%s, 1' % limit)
 		try:
 			self.assertEqual(manu_sql, manu_name)
 			self.assertEqual(des_sql, manu_des)
@@ -385,14 +381,14 @@ class Manufacturer(unittest.TestCase):
 			self.driver.get_screenshot_as_file(u'../images/manu_update_%s.png' % self.now)
 			raise
 		# 修改产品型号（为空时）
-		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[%s]/td[4]/a/img' % count).click()
-		self.driver.find_element(By.XPATH, '//*[@id="assetType"]').click()
-		self.driver.find_element(By.XPATH, '//*[@id="assetType"]/option[1]').click()
-		self.browser.send_keys(*(By.ID, 'txt_MAN_KIND'), value='修改型号test1')
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
+		self.browser.update_press(count)
+		self.browser.obj_type()
+		model = self.model[17]
 		time.sleep(1)
-		model = WebDriverWait(self.driver, 30).until(
-			EC.presence_of_element_located((By.XPATH, '//*[@id="tabMan"]/tbody/tr[%s]/td[3]' % count))).text
+		self.browser.type_model(model)
+		self.browser.sure_press()
+		time.sleep(1)
+		model = self.browser.get_model(count)
 		self.data.commit()
 		model_sql = self.data.select('bmp_manufacturers', fields=['FIELD_1'], limit='%s, 1' % limit)
 		try:
@@ -402,15 +398,15 @@ class Manufacturer(unittest.TestCase):
 			self.driver.get_screenshot_as_file(u'../images/null_model_update_%s.png' % self.now)
 			raise
 		# 修改产品型号（已有试）
-		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[%s]/td[4]/a/img' % (count + 2)).click()
-		self.driver.find_element(By.XPATH, '//*[@id="assetType"]').click()
-		self.driver.find_element(By.XPATH, '//*[@id="assetType"]/option[1]').click()
-		self.browser.send_keys(*(By.ID, 'txt_MAN_KIND'), value='test型号修改2')
-		self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-sure').click()
+		self.browser.update_press(count + 2)
+		self.browser.obj_type()
+		model = self.model[22]
+		self.browser.type_model(model)
+		self.browser.sure_press()
 		time.sleep(1)
-		model = self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[%s]/td[3]' % (count + 2)).text
+		model = self.browser.get_model(count + 2)
 		self.data.commit()
-		model_sql = self.data.select('bmp_manufacturers', fields=['FIELD_1'], limit='%s, 1' % (limit + 2))
+		model_sql = self.data.select(self.tablename, fields=['FIELD_1'], limit='%s, 1' % (limit + 2))
 		try:
 			self.assertEqual(model_sql, model)
 		except Exception as msg:
@@ -421,12 +417,12 @@ class Manufacturer(unittest.TestCase):
 	def test_z_delete_cancel(self):
 		u"""测试取消删除"""
 		self.logger.info('test_z_delete_cancel')
-		records = self.data.count('bmp_manufacturers')
+		records = self.data.count(self.tablename)
 		time.sleep(1)
-		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[5]/img').click()
-		self.driver.find_element(By.XPATH, '//*[@id="jetsen-confirm_button"]/input[2]').click()
+		self.browser.delete_press(1)
+		self.browser.cancel_press()
 		self.data.commit()
-		records_after = self.data.count('bmp_manufacturers')
+		records_after = self.data.count(self.tablename)
 		try:
 			self.assertEqual(records, records_after)
 		except Exception as msg:
@@ -436,24 +432,23 @@ class Manufacturer(unittest.TestCase):
 	def test_z_delete_success(self):
 		u"""测试成功删除厂商"""
 		self.logger.info('test_z_delete_success')
-		WebDriverWait(self.driver, 30).until(
-			EC.presence_of_element_located((By.XPATH, '//*[@id="divManPage"]/img[4]'))).click()
-		# self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[4]').click()
+
+		self.browser.last_page()
 		time.sleep(1)
 		self.data.commit()
-		records = self.data.count('bmp_manufacturers')
+		records = self.data.count(self.tablename)
 		page = math.ceil(records / 20)
 		count = records - 20 * (page - 1) - 3
-		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[%s]/td[5]/img' % count).click()
-		self.driver.find_element(By.XPATH, '//*[@id="jetsen-confirm_button"]/input[1]').click()
+		self.browser.delete_press(count)
+		self.browser.sure_press()
 		time.sleep(1)
 		self.data.commit()
-		records_after = self.data.count('bmp_manufacturers')
+		records_after = self.data.count(self.tablename)
 		try:
 			self.assertEqual(records_after, records - 1)
-			self.data.delete('bmp_manufacturers', where_dict={'FIELD_1': 'test型号add2'})
-			self.data.delete('bmp_manufacturers', where_dict={'MAN_NAME': 'test厂商add2'})
-			self.data.delete('bmp_manufacturers', where_dict={'FIELD_1': 'test型号修改2'})
+			self.data.delete(self.tablename, where_dict={'FIELD_1': 'test型号add2'})
+			self.data.delete(self.tablename, where_dict={'MAN_NAME': 'test厂商add2'})
+			self.data.delete(self.tablename, where_dict={'FIELD_1': 'test型号修改2'})
 		except Exception as msg:
 			self.logger.warning("assert failed: %s" % msg)
 			raise
@@ -461,13 +456,13 @@ class Manufacturer(unittest.TestCase):
 	def test_z_delete_used(self):
 		self.logger.info('test_z_delete_used')
 		# time.sleep(2)
-		self.driver.find_element(By.XPATH, '//*[@id="divManPage"]/img[1]').click()  # 跳转到第一页
+		self.browser.first_page()  # 跳转到第一页
 		time.sleep(1)
-		self.driver.find_element(By.XPATH, '//*[@id="tabMan"]/tbody/tr[1]/td[5]/img').click()
-		text = self.driver.find_element(By.ID, 'jetsen-alert-control-message').text
+		self.browser.delete_press(1)
+		text = self.browser.tips()
 		try:
 			self.assertEqual(u'该厂商下的设备类型已被引用,不能直接删除!', text)
-			self.driver.find_element(By.CLASS_NAME, 'jetsen-btn-know').click()
+			self.browser.know_press()
 		except Exception as msg:
 			self.logger.warning("assert failed: %s" % msg)
 			self.driver.get_screenshot_as_file(u'../images/manu_delete_%s.png' % self.now)

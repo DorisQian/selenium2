@@ -138,7 +138,6 @@ class KeyAttention(unittest.TestCase):
 		key_id = self.data.select(self.tablename, fields=['id'], where_dic={'attention_name': name})
 		try:
 			self.assertEqual(u'重点关注', text)
-			print(text)
 			if str(key_id).isdigit():
 				pass
 			else:
@@ -245,5 +244,5 @@ class KeyAttention(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		cls.driver.quit()
+		# cls.driver.quit()
 		cls.data.close()
