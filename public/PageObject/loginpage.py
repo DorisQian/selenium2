@@ -18,7 +18,6 @@ class LoginPage(Page):
 	_login_button = (By.CLASS_NAME, 'loginbutton')
 	_confirm_window = (By.CLASS_NAME, 'jetsen-window')
 	_kick = (By.XPATH, '//*[@id="jetsen-confirm_button"]/input[2]')
-	_sys_conf = (By.LINK_TEXT, u'系统配置')
 
 	def __init__(self):
 		super(LoginPage, self).__init__()
@@ -41,7 +40,3 @@ class LoginPage(Page):
 			self.find_element(*self._kick).click()
 		except Exception:
 			pass
-
-	def sys_conf(self):
-		u"""系统配置"""
-		self.find_element(*self._sys_conf).click()
