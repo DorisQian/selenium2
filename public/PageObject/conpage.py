@@ -17,5 +17,10 @@ class ConPage(Page):
 		self.driver.switch_to.frame('menu-iframe')
 		self.find_element(By.LINK_TEXT, u' 功能配置').click()
 
+	def knowledge(self):
+		self.driver.switch_to.frame('menu-iframe')
+		self.find_element(By.LINK_TEXT, u' 知识库').click()
 
-
+	def sys_manage(self):
+		self.driver.switch_to.frame('menu-iframe')
+		self.find_element(By.LINK_TEXT, u' 系统管理').click()
