@@ -22,7 +22,6 @@ class KnowledgeTypePage(Page):
 	_name = (By.ID, 'txt_TYPE_NAME')
 	_description = (By.ID, 'txt_TYPE_DESC')
 	_father_type = (By.ID, 'txtParentType')
-	_father_content = (By.LINK_TEXT, u'test添加I/F父类分类')
 	_page_info = (By.XPATH, '//*[@id="divKnowledgeTypePage"]/div')
 
 	def __init__(self):
@@ -88,7 +87,8 @@ class KnowledgeTypePage(Page):
 		text = self.find_element(*self._label).text
 		return text
 
-	def choose_father_type(self):
+	def choose_father_type(self, father):
 		u"""选择父类别"""
+		path = (By.LINK_TEXT, u'%s' % father)
 		self.find_element(*self._father_type).click()
-		self.find_element(*self._father_content).click()
+		self.find_element(*path).click()
