@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 
 class KnowledgeTypePage(Page):
 	u"""
-	重点关注页面封装
+	知识库分类页面封装
 	"""
 
 	_knowledge_type = (By.LINK_TEXT, u' 知识库分类')
