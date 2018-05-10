@@ -3,8 +3,7 @@
 
 from public.log import log
 from conf.configure import conf
-from selenium import webdriver
-#from public.se_rc import driver
+from selenium.webdriver.common.action_chains import ActionChains
 from conf.remote import RemoteDriver
 import time
 import os
@@ -78,3 +77,6 @@ class Page(object):
     def close(self):
         self.driver.quit()
 
+    def drag_and_drop(self, source, target):
+        u"""鼠标拖拽"""
+        ActionChains(self.driver).drag_and_drop(source, target).perform()
