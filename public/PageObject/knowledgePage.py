@@ -12,7 +12,7 @@ class KnowledgePage(Page):
 	知识库页面封装
 	"""
 
-	_knowledge = (By.LINK_TEXT, u' 知识库')
+	_knowledge = (By.XPATH, '//*[@id="menu"]/li[3]/ul/li[1]/a')
 	_label = (By.CLASS_NAME, 'list-title-left')
 	_add = (By.XPATH, '//*[@id="divTop"]/div[2]/button[3]')
 	_sure = (By.CLASS_NAME, 'jetsen-btn-sure')
@@ -22,21 +22,24 @@ class KnowledgePage(Page):
 	_title = (By.ID, 'txt_KNOWLEDGE_TITLE')
 	_type = (By.ID, 'cbo_KNOWLEDGE_TYPE')
 	_keyword = (By.ID, 'txt_KNOWLEDGE_SUMMARY')
-	_source = {By.ID, 'KNOWLEDGE_SOURCE'}
-	_content = {By.ID, 'txt_KNOWLEDGE_CONTENT'}
+	_source = (By.ID, 'KNOWLEDGE_SOURCE')
+	_content = (By.ID, 'txt_KNOWLEDGE_CONTENT')
 	_page_info = (By.XPATH, '//*[@id="divKnowledgePage"]/div')
-	_delete = {By.XPATH, '//*[@id="divTop"]/div[2]/button[1]'}
-	_query = {By.XPATH, '//*[@id="divTop"]/div[2]/button[2]'}
-	_detail_title = {By.ID, 'divKnowledgeTitle2'}
-	_detail_content = {By.ID, 'divKnowledgeContent2'}
-	_comment = {By.ID, 'txtKnowledgeComment2'}
-	_commit = {By.XPATH, '//*[@id="divKnowledgeComment2"]/div/input[1]'}
-	_clear = {By.XPATH, '//*[@id="divKnowledgeComment2"]/div/input[2]'}
-	_comment_content = (By.ID, 'commentBody2_21')
-	_update_comment = (By.XPATH, '//*[@id="divKnowledgeCommentList2"]/div[2]/div[1]/div[2]/a[1]')
-	_update_content = (By.ID, 'txtEditKnowledgeComment2')
-	_update_commit = {By.XPATH, '//*[@id="commentBody2_21"]/div/input[1]'}
-	_delete_comment = {By.XPATH, '//*[@id="divKnowledgeCommentList2"]/div/div[1]/div[2]/a[2]'}
+	_delete = (By.XPATH, '//*[@id="divTop"]/div[2]/button[1]')
+	_query = (By.XPATH, '//*[@id="divTop"]/div[2]/button[2]')
+	_detail_title = (By.ID, 'divKnowledgeTitle2')
+	_detail_content = (By.ID, 'divKnowledgeContent2')
+	_comment = (By.ID, 'txtKnowledgeComment1')
+	_commit = (By.XPATH, '//*[@id="divKnowledgeComment1"]/div/input[1]')
+	_clear = (By.XPATH, '//*[@id="divKnowledgeComment1"]/div/input[2]')
+	_comment_content = (By.ID, 'commentBody1_24')
+	_update_comment = (By.XPATH, '//*[@id="divKnowledgeCommentList1"]/div/div[1]/div[2]/a[1]')
+	_update_content = (By.ID, 'txtEditKnowledgeComment1')
+	_update_commit = (By.XPATH, '//*[@id="commentBody2_21"]/div/input[1]')
+	_delete_comment = (By.XPATH, '//*[@id="divKnowledgeCommentList2"]/div/div[1]/div[2]/a[2]')
+	_attachment = (By.ID, 'fileAttachment')
+	_download = (By.XPATH, '//*[@id="divKnowledgeAttachment3"]/div[2]/a[1]')
+	_delete_attachment = (By.XPATH, '//*[@id="divKnowledgeAttachment3"]/div[2]/a[2]')
 
 	def __init__(self):
 		super(KnowledgePage, self).__init__()
@@ -121,7 +124,7 @@ class KnowledgePage(Page):
 
 	def detail(self, id):
 		u"""点击详情"""
-		path = {By.XPATH, '//*[@id="%s"]/td[8]/a/img' % id}
+		path = (By.XPATH, '//*[@id="%s"]/td[8]/a/img' % id)
 		self.find_element(*path).click()
 
 	def detail_title(self):
@@ -171,3 +174,30 @@ class KnowledgePage(Page):
 	def delete_comment(self):
 		u"""删除评论"""
 		self.find_element(*self._delete_comment).click()
+
+	def multiple_choice(self, source_id, target_id):
+		u"""拖拽多选"""
+		source_path = (By.XPATH, '//*[@id="%s"]/td[1]' % source_id)
+		target_path = (By.XPATH, '//*[@id="%s"]/td[1]' % target_id)
+		source = self.find_element(*source_path)
+		target = self.find_element(*target_path)
+		self.drag_and_drop(source, target)
+
+	def upload(self, id, file):
+		u"""
+		点击上传,并选择文件
+		:param id: 用于定位到上传按钮的xpath
+		:param file: 上传文件的绝对路径
+		:return:
+		"""
+		path = '//*[@id="%s"]/td[9]/img' % id
+		self.find_element(By.XPATH, path).click()
+		self.send_keys(*self._attachment, value=file)
+
+	def download(self):
+		u"""下载附件"""
+		self.find_element(*self._download).click()
+
+	def delete_attachment(self):
+		u"""删除附件"""
+		self.find_element(*self._delete_attachment).click()
