@@ -27,19 +27,13 @@ class KnowledgePage(Page):
 	_page_info = (By.XPATH, '//*[@id="divKnowledgePage"]/div')
 	_delete = (By.XPATH, '//*[@id="divTop"]/div[2]/button[1]')
 	_query = (By.XPATH, '//*[@id="divTop"]/div[2]/button[2]')
-	_detail_title = (By.ID, 'divKnowledgeTitle2')
-	_detail_content = (By.ID, 'divKnowledgeContent2')
-	_comment = (By.ID, 'txtKnowledgeComment1')
-	_commit = (By.XPATH, '//*[@id="divKnowledgeComment1"]/div/input[1]')
-	_clear = (By.XPATH, '//*[@id="divKnowledgeComment1"]/div/input[2]')
-	_comment_content = (By.ID, 'commentBody1_24')
-	_update_comment = (By.XPATH, '//*[@id="divKnowledgeCommentList1"]/div/div[1]/div[2]/a[1]')
-	_update_content = (By.ID, 'txtEditKnowledgeComment1')
-	_update_commit = (By.XPATH, '//*[@id="commentBody2_21"]/div/input[1]')
-	_delete_comment = (By.XPATH, '//*[@id="divKnowledgeCommentList2"]/div/div[1]/div[2]/a[2]')
+	_detail_title = (By.ID, 'divKnowledgeTitle8')
+	_detail_content = (By.ID, 'divKnowledgeContent8')
+	_update_comment = (By.XPATH, '//*[@id="divKnowledgeCommentList4"]/div/div[1]/div[2]/a[1]')
+	_delete_comment = (By.XPATH, '//*[@id="divKnowledgeCommentList7"]/div/div[1]/div[2]/a[2]')
 	_attachment = (By.ID, 'fileAttachment')
-	_download = (By.XPATH, '//*[@id="divKnowledgeAttachment3"]/div[2]/a[1]')
-	_delete_attachment = (By.XPATH, '//*[@id="divKnowledgeAttachment3"]/div[2]/a[2]')
+	_download = (By.XPATH, '//*[@id="divKnowledgeAttachment5"]/div[2]/a[1]')
+	_delete_attachment = (By.XPATH, '//*[@id="divKnowledgeAttachment6"]/div[2]/a[2]')
 
 	def __init__(self):
 		super(KnowledgePage, self).__init__()
@@ -137,39 +131,55 @@ class KnowledgePage(Page):
 		text = self.find_element(*self._detail_content).text
 		return text
 
-	def comment(self, comment):
-		u"""填写评论"""
-		self.send_keys(*self._comment, value=comment)
+	def comment(self, num, comment):
+		u"""
+		填写评论
+		:param num: 每次点击详细，id会变化，按顺序传入数字确定path
+		:param comment:评论内容
+		:return:
+		"""
+		path = (By.ID, 'txtKnowledgeComment%s' % num)
+		self.send_keys(*path, value=comment)
 
-	def commit(self):
+	def commit(self, num):
 		u"""提交评论"""
-		self.find_element(*self._commit).click()
+		path = (By.XPATH, '//*[@id="divKnowledgeComment%s"]/div/input[1]' % num)
+		self.find_element(*path).click()
 
-	def clear(self):
+	def clear(self, num):
 		u"""清空评论"""
-		self.find_element(*self._clear).click()
+		path = (By.XPATH, '//*[@id="divKnowledgeComment%s"]/div/input[2]' % num)
+		self.find_element(*path).click()
 
-	def get_comment(self):
-		u"""获取文本框中评论内容"""
-		text = self.find_element(*self._comment).text
+	def get_comment(self, num):
+		u"""
+		获取文本框中评论内容
+		:param num: 传入num来匹配变化的path
+		:return:
+		"""
+		path = (By.ID, 'txtKnowledgeComment%s' % num)
+		text = self.find_element(path).text
 		return text
 
-	def get_comment_content(self):
+	def get_comment_content(self, num, id):
 		u"""获取已发表评论内容"""
-		text = self.find_element(*self._comment_content).text
+		_comment_content = (By.ID, 'commentBody%s_%s' % (num, id))
+		text = self.find_element(*_comment_content).text
 		return text
 
 	def update_comment(self):
 		u"""修改评论"""
 		self.find_element(*self._update_comment).click()
 
-	def update_content(self, content):
+	def update_content(self, num, content):
 		u"""修改评论内容"""
-		self.send_keys(*self._update_content, value=content)
+		_update_content = (By.ID, 'txtEditKnowledgeComment%s' % num)
+		self.send_keys(*_update_content, value=content)
 
-	def update_commit(self):
+	def update_commit(self, id):
 		u"""提交修改后评论"""
-		self.find_element(*self._update_commit).click()
+		_update_commit = (By.XPATH, '//*[@id="commentBody4_%s"]/div/input[1]' % id)
+		self.find_element(*_update_commit).click()
 
 	def delete_comment(self):
 		u"""删除评论"""
@@ -192,7 +202,7 @@ class KnowledgePage(Page):
 		"""
 		path = '//*[@id="%s"]/td[9]/img' % id
 		self.find_element(By.XPATH, path).click()
-		self.send_keys(*self._attachment, value=file)
+		self.send_keys(*self._attachment, value=file, clear_first=False, click_first=False)
 
 	def download(self):
 		u"""下载附件"""
