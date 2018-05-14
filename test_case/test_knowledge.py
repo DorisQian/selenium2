@@ -134,16 +134,17 @@ class Knowledge(unittest.TestCase):
 	def test_detail(self):
 		u"""测试详细展示"""
 		self.logger.info('test detail')
-		title = self.title[4]
-		content = self.content[4]
+		title = self.title[17]
+		content = self.content[17]
 		id = self.data.select(self.k_table, fields=['knowledge_id'], where_dic={'knowledge_title': title})
 		try:
 			self.browser.detail(id)
 			d_title = self.browser.detail_title()
 			d_content = self.browser.detail_content()
+			time.sleep(1)
+			self.browser.cancel_press()
 			self.assertEqual(title, d_title)
 			self.assertEqual(content, d_content)
-			self.browser.cancel_press()
 		except Exception as msg:
 			self.logger.warning(msg)
 			self.driver.get_screenshot_as_file(u'../images/test_detail_%s.png' % self.now)
@@ -157,7 +158,7 @@ class Knowledge(unittest.TestCase):
 		try:
 			self.browser.detail(id)
 			time.sleep(1)
-			self.browser.commit()
+			self.browser.commit(1)
 			text = self.browser.tips()
 			self.browser.know_press()
 			self.browser.cancel_press()
@@ -175,12 +176,14 @@ class Knowledge(unittest.TestCase):
 		comment = self.content[6]
 		try:
 			self.browser.detail(id)
-			self.browser.comment(comment)
-			self.browser.clear()
-			text = self.browser.get_comment()
-			self.browser.cancel_press()
 			time.sleep(1)
-			self.assertEqual('', text)
+			self.browser.comment(2, comment)
+			self.browser.clear(2)
+			self.browser.commit(2)
+			text = self.browser.tips()
+			self.browser.know_press()
+			self.browser.cancel_press()
+			self.assertEqual(u"不能为空值", text)
 		except Exception as msg:
 			self.logger.warning(msg)
 			self.driver.get_screenshot_as_file(u'../images/test_add_z_clear_%s.png' % self.now)
@@ -195,10 +198,14 @@ class Knowledge(unittest.TestCase):
 		try:
 			self.browser.detail(id)
 			time.sleep(1)
-			self.browser.comment(comment)
-			self.browser.commit()
-			text = self.browser.get_comment_content()
+			self.browser.comment(3, comment)
+			self.browser.commit(3)
+			time.sleep(1)
+			self.data.commit()
+			c_id = self.data.select(self.c_table, fields=['comment_id'], where_dic={'comment_content': ('@' + comment + '@')})
+			text = self.browser.get_comment_content(3, c_id)
 			self.browser.cancel_press()
+			time.sleep(1)
 			self.assertEqual(comment, text)
 		except Exception as msg:
 			self.logger.warning(msg)
@@ -211,33 +218,39 @@ class Knowledge(unittest.TestCase):
 		title = self.title[4]
 		id = self.data.select(self.k_table, fields=['knowledge_id'], where_dic={'knowledge_title': title})
 		comment = self.content[9]
+		o_comment = self.content[7]
 		try:
 			self.browser.detail(id)
 			self.browser.update_comment()
-			self.browser.update_content(comment)
-			self.browser.update_commit()
-			text = self.browser.get_comment_content()
-			self.assertEqual(comment, text)
+			self.browser.update_content(4, comment)
+			c_id = self.data.select(self.c_table, fields=['comment_id'],
+									where_dic={'comment_content': ('@' + o_comment + '@')})
+			self.browser.update_commit(c_id)
+			time.sleep(1)
+			text = self.browser.get_comment_content(4, c_id)
 			self.browser.cancel_press()
+			self.assertEqual(comment, text)
 		except Exception as msg:
 			self.logger.warning(msg)
-			self.driver.get_screenshot_as_file(u'../images/test_add_z_comment_success_%s.png' % self.now)
+			self.driver.get_screenshot_as_file(u'../images/test_b_update_comment_%s.png' % self.now)
 			raise
 
 	def test_delete_comment(self):
 		u"""测试删除评论"""
 		self.logger.info('test delete comment')
-		title = self.title[4]
+		title = self.title[17]
 		id = self.data.select(self.k_table, fields=['knowledge_id'], where_dic={'knowledge_title': title})
 		try:
 			count_before = self.data.count(self.c_table)
 			self.browser.detail(id)
+			time.sleep(1)
 			self.browser.delete_comment()
 			self.browser.sure_press()
+			time.sleep(1)
 			self.browser.cancel_press()
 			self.data.commit()
 			after_count = self.data.count(self.c_table)
-			self.assertEqual(after_count, count_before + 1)
+			self.assertEqual(after_count, count_before - 1)
 		except Exception as msg:
 			self.logger.warning(msg)
 			self.driver.get_screenshot_as_file(u'../images/test_delete_comment_%s.png' % self.now)
@@ -281,6 +294,7 @@ class Knowledge(unittest.TestCase):
 			self.browser.type_content(content)
 			self.browser.sure_press()
 			self.data.commit()
+			time.sleep(1)
 			sql_title = self.data.select(self.k_table, fields=['knowledge_title'], where_dic={'knowledge_id': str(id)})
 			self.assertEqual(title, sql_title)
 		except Exception as msg:
@@ -295,11 +309,14 @@ class Knowledge(unittest.TestCase):
 		id = self.data.select(self.k_table, fields=['knowledge_id'], where_dic={'knowledge_title': title})
 		try:
 			before_count = self.data.count(self.k_table)
+			self.data.commit()
+			time.sleep(1)
 			self.browser.delete_press(id)
 			self.browser.sure_press()
+			time.sleep(1)
 			self.data.commit()
 			after_count = self.data.count(self.k_table)
-			self.assertEqual(after_count, before_count + 1)
+			self.assertEqual(after_count, before_count - 1)
 		except Exception as msg:
 			self.logger.warning(msg)
 			self.driver.get_screenshot_as_file(u'../images/test_delete_one_%s.png' % self.now)
@@ -317,6 +334,7 @@ class Knowledge(unittest.TestCase):
 			self.browser.multiple_choice(source_id, target_id)
 			self.browser.multiple_delete()
 			self.browser.sure_press()
+			time.sleep(1)
 			self.data.commit()
 			after_count = self.data.count(self.k_table)
 			self.assertEqual(after_count, before_count - 2)
@@ -333,13 +351,18 @@ class Knowledge(unittest.TestCase):
 		id = self.data.select(self.k_table, fields=['knowledge_id'], where_dic={'knowledge_title': title})
 		try:
 			self.browser.upload(id, attachment)
+			self.browser.sure_press()
+			time.sleep(5)
 			self.browser.know_press()
-			attachment_id = self.data.select('bmp_knowledgeattachment', fields=['attachment_id'], where_dic={'knowledge_id': id})
+			self.data.commit()
+			attachment_id = self.data.select('bmp_knowledgeattachment', fields=['attachment_id'],
+											where_dic={'knowledge_id': str(id)})
 			if str(attachment_id).isdigit():
 				pass
 			else:
 				raise AssertionError('upload failed')
-			path = self.data.select('bmp_knowledgeattachment', fields=['attachment_path'], where_dic={'knowledge_id': id})
+			path = self.data.select('bmp_knowledgeattachment', fields=['attachment_path'],
+									where_dic={'knowledge_id': str(id)})
 			ssh_host = 'root@172.17.1.208'
 			file = '/opt/socserver/webapps/SOC2.0/' + path
 			resp = subprocess.call(['ssh', ssh_host, 'test -e ' + pipes.quote(file)])
@@ -362,7 +385,7 @@ class Knowledge(unittest.TestCase):
 			self.browser.detail(id)
 			self.browser.download()
 			self.browser.cancel_press()
-			win = winrm.Session('http://172.17.1.205:5985/wsman', auth=('doris', '123456'))
+			win = winrm.Session('http://172.17.1.205:5985/wsman', auth=('doris', 'admin@123'))
 			r = win.run_cmd(('cd C:\\Users\\doris\\Downloads &'
 							'dir'))
 			files = r.std_out.decode()
@@ -383,10 +406,14 @@ class Knowledge(unittest.TestCase):
 		path = self.data.select('bmp_knowledgeattachment', fields=['attachment_path'], where_dic={'knowledge_id': str(id)})
 		try:
 			self.browser.detail(id)
+			time.sleep(1)
 			self.browser.delete_attachment()
+			self.browser.sure_press()
 			self.browser.cancel_press()
+			time.sleep(1)
+			self.data.commit()
 			attachment_id = self.data.select('bmp_knowledgeattachment', fields=['attachment_id'],
-											where_dic={'knowledge_id': id})
+											where_dic={'knowledge_id': str(id)})
 			if str(attachment_id).isdigit():
 				raise AssertionError('delete attachment failed')
 			ssh_host = 'root@172.17.1.208'
@@ -396,6 +423,7 @@ class Knowledge(unittest.TestCase):
 				raise AssertionError('delete attachment failed, server path still have the file')
 		except Exception as msg:
 			self.logger.warning(msg)
+			raise
 
 	@classmethod
 	def tearDownClass(cls):
